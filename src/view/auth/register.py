@@ -18,9 +18,11 @@ from PyQt5.QtCore import Qt, QEvent, QDate, pyqtSignal
 
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))
 
 from src.controller.switch_controller import switch_to_login
+from src.model.database.db_connection import connect_to_db
+from src.controller.auth_controller import validate_fields_register
 
 class Register(QMainWindow):
     switch_to_login = pyqtSignal()
@@ -76,11 +78,30 @@ class Register(QMainWindow):
 
         self.date_birthdate = QDateEdit()
         self.date_birthdate.setStyleSheet("""
-            color: white; 
-            border-radius: 10px;
-            border: 1px solid #ccc;
-            padding: 3px;
-            padding-left: 10px;
+            QDateEdit {
+                color: white;
+                border-radius: 10px;
+                border: 1px solid #ccc;
+                padding: 3px;
+                padding-left: 10px;
+                background-color: #233240;  /* Fondo más oscuro */
+            }
+            QDateEdit::down-arrow {
+                image: url(path_to_custom_arrow.png);  /* Aquí puedes poner una imagen personalizada para la flecha */
+                width: 20px;  /* Ajusta el tamaño de la flecha */
+                height: 20px;
+                margin: 0px;
+            }
+            QDateEdit::down-arrow:hover {
+                image: url(path_to_custom_arrow_hover.png);  /* Imagen diferente cuando se pasa el mouse sobre la flecha */
+            }
+            QDateEdit::drop-down {
+                subcontrol-origin: padding;
+                subcontrol-position: top right;
+                width: 25px;
+                background-color: #3F556B;  /* Fondo del área del botón de la flecha */
+                border-radius: 10px;
+            }
         """)
         self.date_birthdate.setFixedSize(300, 50)
         self.date_birthdate.setCalendarPopup(True)
@@ -96,7 +117,7 @@ class Register(QMainWindow):
             font-size: 16px;
         """)
         self.button.setCursor(Qt.PointingHandCursor)  # Cambiar el cursor a puntero
-        self.button.clicked.connect(self.validate_fields)
+        self.button.clicked.connect(lambda: validate_fields_register(self))
 
         self.already_account_label = QLabel("<a href='#' style='color: #94A7BB; text-decoration: none;'>Do you already have an account?</a>")
         self.already_account_label.setStyleSheet("color: #1ABC9C; font-size: 12px;")
@@ -123,7 +144,7 @@ class Register(QMainWindow):
 
         # Añadir el layout de contenido principal al layout de la ventana
         self.layout.addLayout(self.main_content_layout)
-    
+
     def toggle_password_visibility(self):
         if self.toggle_button.isChecked():
             self.text_password.setEchoMode(QLineEdit.Normal)
@@ -131,17 +152,3 @@ class Register(QMainWindow):
         else:
             self.text_password.setEchoMode(QLineEdit.Password)
             self.toggle_button.setIcon(QIcon("src/resources/images/password/white/showpasswordwhite.png"))
-
-    def validate_fields(self):
-        username = self.text_username.text().strip()
-        email = self.text_email.text().strip()
-        password = self.text_password.text().strip()
-        birthdate = self.date_birthdate.date()
-
-        # Verifica que los campos no estén vacíos
-        if not username or not email or not password:
-            QMessageBox.warning(self, "Lena AI", "Please fill in all fields.")
-            return
-
-        # Si todo es válido
-        QMessageBox.information(self, "Success", "All fields are valid!")

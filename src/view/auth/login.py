@@ -18,10 +18,11 @@ from PyQt5.QtCore import Qt, QEvent, QDate, pyqtSignal
 
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))
 
-from src.controller.auth_controller import recover_password, validate_fields
+from src.controller.auth_controller import validate_fields_login
 from src.controller.switch_controller import switch_to_register
+from src.view.auth.recover_password import recover_password
 
 class Login(QMainWindow):
     switch_to_register = pyqtSignal()
@@ -88,7 +89,7 @@ class Login(QMainWindow):
             font-size: 16px;
         """)
         self.button.setCursor(Qt.PointingHandCursor)  # Cambiar el cursor a puntero
-        self.button.clicked.connect(lambda: validate_fields(self))
+        self.button.clicked.connect(lambda: validate_fields_login(self))
 
         self.already_account_label = QLabel("<a href='#' style='color: #94A7BB; text-decoration: none;'>Don't have an account?</a>")
         self.already_account_label.setStyleSheet("color: #1ABC9C; font-size: 13px;")

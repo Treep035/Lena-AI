@@ -104,10 +104,9 @@ class Chat(QMainWindow):
 <div style='text-align: left; direction: ltr;'>
     <img src='src/resources/images/lenachat.png' alt='Foto de Lena' style='width: 30px; height: 30px; vertical-align: middle; margin-right: 10px;'>
     <strong>Lena</strong><br>
-    Hola, ¿en qué puedo ayudarte?
+    <div style='margin-left: 40px;'>Hola, ¿en qué puedo ayudarte?</div>
 </div>
 """
-
 
             
             # Combinar ambos mensajes en el chat

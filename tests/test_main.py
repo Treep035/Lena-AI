@@ -1,12 +1,15 @@
 import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
+
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
-from test_bottombar import BottomBar
-from test_home import Home
-from test_titlebar import TitleBar
-from test_chat import Chat
-from test_account import Account
+from view.shared.bottombar import BottomBar
+from view.shared.titlebar import TitleBar
+from view.home.home import Home
+from view.home.chat import Chat
+from view.home.account import Account
 
 class MainWindow(QMainWindow):
     def __init__(self):

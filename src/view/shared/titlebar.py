@@ -10,7 +10,7 @@ from PyQt5.QtCore import Qt, QEvent
 
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))
 
 # from src.controller.titlebar_controller import mousePressEvent, mouseMoveEvent, eventFilter, minimize
 

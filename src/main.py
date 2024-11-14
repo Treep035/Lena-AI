@@ -2,9 +2,9 @@ import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
-from view.titlebar import TitleBar
-from view.login import Login
-from view.register import Register
+from view.shared.titlebar import TitleBar
+from view.auth.login import Login
+from view.auth.register import Register
 
 class MainWindow(QMainWindow):
     def __init__(self):
