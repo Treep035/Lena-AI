@@ -39,7 +39,32 @@ class Chat(QMainWindow):
         # self.main_content_layout.setContentsMargins(75, 10, 75, 125)  # Márgenes para el contenido
 
         self.chat_display = QTextEdit(self)
-        self.chat_display.setStyleSheet("color: white; background-color: #19232D; border: none;")
+        self.chat_display.setStyleSheet("""
+            QTextEdit {
+                color: white; 
+                background-color: #19232D; 
+                border: none;
+                font-size: 15px;
+            }
+            QScrollBar:vertical {
+                background: #2C3E50;
+                width: 10px;
+                margin: 0px;
+                border-radius: 5px;
+            }
+            QScrollBar::handle:vertical {
+                background: #3F556B;
+                min-height: 20px;
+                border-radius: 5px;
+            }
+            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+                background: none;
+                height: 0px;
+            }
+            QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+                background: none;
+            }
+        """)
         self.chat_display.setReadOnly(True)  # No se puede escribir directamente aquí
         self.layout.addWidget(self.chat_display)
         
@@ -88,10 +113,24 @@ class Chat(QMainWindow):
     def send_message(self):
         message = self.message_input.text()
         
+        # Diccionario de respuestas automáticas
+        respuestas_bot = {
+            ("hola", "buenas", "hi"): "¡Hola! ¿Cómo estás?",
+            ("adiós", "bye", "hasta luego"): "¡Hasta luego! Espero verte pronto.",
+            ("¿cómo estás?", "que tal estas?", "cómo te encuentras"): "Estoy aquí para ayudarte. ¿En qué puedo asistirte?",
+            ("gracias", "thank you"): "¡De nada! Siempre a tu servicio.",
+        }
+
+        bot_response = "Lo siento, no entiendo esa pregunta."  # Respuesta por defecto
+        for keys, response in respuestas_bot.items():
+            if message in keys:
+                bot_response = response
+                break
+        
         if message:
             # Crear el mensaje del usuario alineado a la derecha
             user_message = f"""
-                <div style='text-align: right;'>
+                <div style='text-align: right; margin-right: 75px;'>
                     <strong>User</strong><br>
                     <div style='background-color: #2C3E50; padding: 10px; border-radius: 10px; margin-bottom: 5px; display: inline-block; max-width: 80%; word-wrap: break-word;'>
                         {message}
@@ -99,15 +138,14 @@ class Chat(QMainWindow):
                 </div>
                 """
             
-            # Respuesta automática del bot alineada a la izquierda
+            # Respuesta automática según el mensaje
             bot_message = f"""
-<div style='text-align: left; direction: ltr;'>
-    <img src='src/resources/images/lenachat.png' alt='Foto de Lena' style='width: 30px; height: 30px; vertical-align: middle; margin-right: 10px;'>
-    <strong>Lena</strong><br>
-    <div style='margin-left: 40px;'>Hola, ¿en qué puedo ayudarte?</div>
-</div>
-"""
-
+            <div style='text-align: left; direction: ltr;'>
+                <img src='src/resources/images/lenachat.png' alt='Foto de Lena' style='width: 30px; height: 30px; vertical-align: middle; margin-right: 10px; margin-left: -30px;'>
+                <strong>Lena</strong><br>
+                <div style='margin-left: 40px;'>{bot_response}</div>
+            </div>
+            """
             
             # Combinar ambos mensajes en el chat
             current_content = self.chat_display.toHtml()
@@ -118,6 +156,7 @@ class Chat(QMainWindow):
             
             # Limpiar el cuadro de entrada
             self.message_input.clear()
+
 
 
             # Aquí podrías agregar lógica para simular una respuesta automática o procesar el mensaje

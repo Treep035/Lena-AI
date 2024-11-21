@@ -1,1 +1,4 @@
 .env
+tests/test_api.py
+__pycache__/
+src/model/core/vosk-model-es-0.42/

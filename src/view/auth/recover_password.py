@@ -23,7 +23,7 @@ from PyQt5.QtGui import QFont, QPixmap, QTextCursor, QIcon, QCursor
 from PyQt5.QtCore import Qt, QEvent, QDate, QSize, QTimer
 
 from view.shared.titlebar_dialog import TitleBarDialog
-from controller.recover_password_controller import send_recovery_email
+from controller.recover_password_controller import send_recovery_email_controller
 
 def recover_password(parent):
     dialog = QDialog(parent)
@@ -86,7 +86,7 @@ def recover_password(parent):
     def on_send_clicked_or_enter():
         email = email_input.text()
         if email:
-            sent = send_recovery_email(email)
+            sent = send_recovery_email_controller(email)
             if (sent):
                 status_label.setText("Email sent successfully.")
                 status_label.setStyleSheet("color: #BDECB6; font-size: 10px;")

@@ -1,43 +1,45 @@
-import mysql.connector
-from mysql.connector import Error
+import pymysql
+from pymysql import MySQLError
 
 def connect_to_db():
     try:
-        print("Intentando conectar a la base de datos...")
-        connection = mysql.connector.connect(
+        connection = pymysql.connect(
             host='localhost',
             database='lenaai',
             user='root',
             password='root'
         )
-        if connection.is_connected():
-            print("Conexión exitosa a la base de datos.")
-        else:
-            print("Error: La conexión no se estableció correctamente.")
+        print("Conexión exitosa a la base de datos")
         return connection  # Devuelve la conexión para usarla más adelante
-    except Error as e:
+    except MySQLError as e:
         print(f"Error al conectar a MySQL: {e}")
         return None
 
 def close_connection(connection):
-    if connection and connection.is_connected():
+    if connection and connection.open:
         connection.close()
-        print("Conexión cerrada.")
+        print("Conexión cerrada")
 
 def get_user_name(connection, user_id):
     try:
-        cursor = connection.cursor()
-        query = "SELECT name FROM user WHERE id_user = %s"
-        cursor.execute(query, (user_id,))
-        result = cursor.fetchone()  # Obtener una fila del resultado
-        if result:
-            return result[0]  # Retornar el nombre si se encuentra
-        else:
-            return None  # Si no se encuentra el usuario
-
-    except Error as e:
+        with connection.cursor() as cursor:
+            query = "SELECT name FROM user WHERE id_user = %s"
+            cursor.execute(query, (user_id,))
+            result = cursor.fetchone()  # Obtener una fila del resultado
+            if result:
+                return result[0]  # Retornar el nombre si se encuentra
+            else:
+                return None  # Si no se encuentra el usuario
+    except MySQLError as e:
         print(f"Error al obtener el nombre: {e}")
         return None
 
 if __name__ == "__main__":
-    connect_to_db()
+    connection = connect_to_db()
+    if connection:
+        user_name = get_user_name(connection, 1)  # Prueba con el id de usuario 1
+        if user_name:
+            print(f"Nombre del usuario: {user_name}")
+        else:
+            print("Usuario no encontrado")
+        close_connection(connection)

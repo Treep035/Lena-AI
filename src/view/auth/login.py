@@ -14,18 +14,20 @@ from PyQt5.QtWidgets import (
     QSizePolicy
 )
 from PyQt5.QtGui import QFont, QPixmap, QTextCursor, QIcon
-from PyQt5.QtCore import Qt, QEvent, QDate, pyqtSignal
+from PyQt5.QtCore import Qt, QEvent, QDate, pyqtSignal, QTimer
+import time
 
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))
 
-from src.controller.auth_controller import validate_fields_login
-from src.controller.switch_controller import switch_to_register
+from src.controller.auth_controller import validate_fields_login_controller
 from src.view.auth.recover_password import recover_password
+from src.controller.auth_token_controller import generate_tokens_controller, insert_tokens_controller
 
 class Login(QMainWindow):
     switch_to_register = pyqtSignal()
+    switch_to_home = pyqtSignal()
     def __init__(self):
         super().__init__()
 
@@ -58,12 +60,14 @@ class Login(QMainWindow):
         self.text_email.setPlaceholderText("Email...")
         self.text_email.setStyleSheet("color: white; border-radius: 10px; border: 1px solid #ccc; padding: 3px; padding-left: 10px;")
         self.text_email.setFixedSize(300, 50)
+        self.text_email.textChanged.connect(self.remove_error_message)
 
         self.text_password = QLineEdit()
         self.text_password.setPlaceholderText("Password...")
-        self.text_password.setStyleSheet("color: white; border-radius: 10px; border: 1px solid #ccc; padding: 3px; padding-left: 10px;")
+        self.text_password.setStyleSheet("color: white; border-radius: 10px; border: 1px solid #ccc; padding: 3px; padding-left: 10px; padding-right: 45px;")
         self.text_password.setEchoMode(QLineEdit.Password)
         self.text_password.setFixedSize(300, 50)
+        self.text_password.textChanged.connect(self.remove_error_message)
 
         self.toggle_button = QPushButton()
         self.toggle_button.setIcon(QIcon("src/resources/images/password/white/showpasswordwhite.png"))  # Cambia "path/to/eye_icon.png" a la ruta de tu icono de ojo self
@@ -89,20 +93,24 @@ class Login(QMainWindow):
             font-size: 16px;
         """)
         self.button.setCursor(Qt.PointingHandCursor)  # Cambiar el cursor a puntero
-        self.button.clicked.connect(lambda: validate_fields_login(self))
+        self.button.clicked.connect(self.on_login_button_click)
+
+        self.status_label = QLabel()
+        self.status_label.setAlignment(Qt.AlignCenter)
+        
+        self.status_label_invalid = QLabel()
+        self.status_label_invalid.setAlignment(Qt.AlignCenter)
 
         self.already_account_label = QLabel("<a href='#' style='color: #94A7BB; text-decoration: none;'>Don't have an account?</a>")
         self.already_account_label.setStyleSheet("color: #1ABC9C; font-size: 13px;")
         self.already_account_label.setAlignment(Qt.AlignCenter)
         self.already_account_label.setFixedSize(300, 20)
         self.already_account_label.setTextInteractionFlags(Qt.TextBrowserInteraction)
-        self.already_account_label.linkActivated.connect(lambda: switch_to_register(self))
+        self.already_account_label.linkActivated.connect(self.switch_to_register.emit)
 
         password_layout = QHBoxLayout()
         password_layout.addWidget(self.text_password)
         password_layout.addWidget(self.toggle_button)
-        password_layout.setContentsMargins(0, 0, 0, 0)
-        password_layout.setSpacing(0)
 
         # Añadir widgets al layout principal
         self.main_content_layout.addWidget(self.label)
@@ -123,3 +131,39 @@ class Login(QMainWindow):
         else:
             self.text_password.setEchoMode(QLineEdit.Password)
             self.toggle_button.setIcon(QIcon("src/resources/images/password/white/showpasswordwhite.png"))
+
+    def on_login_button_click(self):
+        no_fields, invalid_fields, logged_in, id_user = validate_fields_login_controller(self)
+        if no_fields:
+            self.main_content_layout.removeWidget(self.status_label_invalid)
+            self.status_label_invalid.hide()
+            self.main_content_layout.addWidget(self.status_label)
+            self.status_label.show()
+            self.status_label.setText("<a href='#' style='color: #C53B3D ; font-size: 15px; font-weight: bold; text-decoration: none;'>Please, fill in all fields</a>")
+            self.status_label.setAlignment(Qt.AlignCenter)
+        elif invalid_fields:
+            self.main_content_layout.addWidget(self.status_label_invalid)
+            self.status_label_invalid.show()
+            self.status_label_invalid.setText("<a href='#' style='color: #C53B3D ; font-size: 15px; font-weight: bold; text-decoration: none;'>The email or password is incorrect</a>")
+            self.status_label_invalid.setAlignment(Qt.AlignCenter)
+            QTimer.singleShot(2000, self.remove_error_message)
+        elif logged_in:
+            self.main_content_layout.removeWidget(self.status_label_invalid)
+            self.status_label_invalid.hide()
+            self.main_content_layout.addWidget(self.status_label)
+            self.status_label.show()
+            self.status_label.setText("<a href='#' style='color: #1ABC9C; font-size: 15px; font-weight: bold; text-decoration: none;'>Logged in successfully</a>")
+            self.status_label.setAlignment(Qt.AlignCenter)
+            auth_token, refresh_token, auth_token_expiration, refresh_token_expiration = generate_tokens_controller()
+            insert_tokens_controller(id_user, auth_token, refresh_token, auth_token_expiration, refresh_token_expiration)
+            QTimer.singleShot(3000, self.remove_error_message)
+            QTimer.singleShot(3000, self.switch_to_home.emit)
+            
+    def remove_error_message(self):
+        self.main_content_layout.removeWidget(self.status_label)
+        self.status_label.hide()
+    
+    def get_email(self):
+        # Obtener el texto ingresado en el QLineEdit
+        email = self.text_email.text()
+        return email
