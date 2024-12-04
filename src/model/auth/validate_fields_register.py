@@ -1,6 +1,6 @@
 import bcrypt
 import re
-import datetime
+from datetime import datetime
 from model.database.db_connection import connect_to_db
 
 from PyQt5.QtWidgets import (QMessageBox)

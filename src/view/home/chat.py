@@ -16,6 +16,8 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtGui import QFont, QPixmap, QTextCursor, QIcon, QCursor
 from PyQt5.QtCore import Qt, QEvent, QDate, pyqtSignal, QSize
 
+import random
+import webbrowser
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
@@ -23,6 +25,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '.
 class Chat(QMainWindow):
     def __init__(self):
         super().__init__()
+
+        self.jugando_piedra_papel_tijeras = False
 
         # Layout principal
         self.layout = QVBoxLayout()
@@ -111,8 +115,8 @@ class Chat(QMainWindow):
         self.layout.addLayout(self.input_layout)
         
     def send_message(self):
-        message = self.message_input.text()
-        
+        message = self.message_input.text().strip().lower()  # Convertir el mensaje a minúsculas y quitar espacios
+
         # Diccionario de respuestas automáticas
         respuestas_bot = {
             ("hola", "buenas", "hi"): "¡Hola! ¿Cómo estás?",
@@ -121,7 +125,99 @@ class Chat(QMainWindow):
             ("gracias", "thank you"): "¡De nada! Siempre a tu servicio.",
         }
 
-        bot_response = "Lo siento, no entiendo esa pregunta."  # Respuesta por defecto
+        programas_disponibles = {
+            "calculadora": "calc",  # En Windows
+            "bloc de notas": "notepad",  # En Windows
+            "navegador": "https://www.google.com",  # Cambiar por el navegador instalado
+            "explorador": "explorer",  # Explorador de archivos en Windows
+            "word": "winword",  # Microsoft Word en Windows
+            "excel": "excel",  # Abre Microsoft Excel
+            "powerpoint": "powerpnt", # Abre Microsoft PowerPoint
+        }
+
+        # Comprobar si el mensaje comienza con "busca"
+        if any(form in message for form in ["busca", "busques", "buscases", "buscar"]):
+            # Dividir el mensaje en palabras y encontrar la posición de la forma del verbo
+            palabras = message.split()
+            try:
+                # Encontrar el índice de cualquiera de las formas del verbo
+                indice_busca = next(i for i, word in enumerate(palabras) if word in ["busca", "busques", "buscases", "buscar"])
+                # Combinar las palabras después de la forma del verbo para formar la consulta
+                query = " ".join(palabras[indice_busca + 1:]).strip()
+                if query:
+                    webbrowser.open(f"https://www.google.com/search?q={query}")
+                    bot_response = f"Buscando en Google: {query}"
+                else:
+                    bot_response = "Por favor, especifica qué deseas buscar."
+            except StopIteration:
+                bot_response = "No entendí qué buscar. Por favor, intenta de nuevo."
+
+        elif message.startswith("abre"):
+            programa = message[5:].strip()  # Obtener el texto después de "abre"
+            if programa in programas_disponibles:
+                try:
+                    os.startfile(programas_disponibles[programa]) 
+                    bot_response = f"Abriendo {programa}..."
+                except Exception as e:
+                    bot_response = f"No se pudo abrir {programa}: {str(e)}"
+            else:
+                bot_response = f"No conozco el programa '{programa}'. Por favor, verifica el nombre."
+
+        elif message.startswith("cara o cruz"):
+            resultado = random.choice(["Cara", "Cruz"])
+            bot_response = f"El resultado es: {resultado}."
+
+        elif "piedra papel tijeras" in message:
+            # Instrucciones para jugar
+            bot_response = (
+                "¡Vamos a jugar Piedra, Papel o Tijeras! Escribe 'piedra', 'papel' o 'tijeras' para hacer tu elección."
+            )
+            self.jugando_piedra_papel_tijeras = True
+
+        elif self.jugando_piedra_papel_tijeras:
+            if message in ["piedra", "papel", "tijeras"]:
+                opciones = ["piedra", "papel", "tijeras"]
+                eleccion_bot = random.choice(opciones)
+
+                if message == eleccion_bot:
+                    resultado = "¡Empate!"
+                elif (message == "piedra" and eleccion_bot == "tijeras") or \
+                     (message == "papel" and eleccion_bot == "piedra") or \
+                     (message == "tijeras" and eleccion_bot == "papel"):
+                    resultado = "¡Ganaste!"
+                else:
+                    resultado = "Perdiste."
+
+                bot_response = (
+                    f"Tú elegiste: {message.capitalize()}. Lena eligió: {eleccion_bot.capitalize()}. {resultado}"
+                )
+                self.jugando_piedra_papel_tijeras = False  # Termina el juego
+            else:
+                bot_response = "Por favor, elige entre 'piedra', 'papel' o 'tijeras'."
+
+        elif message.lower().startswith("nota de texto"):
+            # Extraer el contenido de la nota
+            contenido_nota = message[13:].strip()  # Quita "nota de texto"
+            if contenido_nota:
+                documents_path = os.path.join(os.path.expanduser("~"))
+                # Crear un archivo de texto
+                file_path = os.path.join(documents_path, "LenaAI.txt")  # Cambia el nombre del archivo si es necesario
+                with open(file_path, "w", encoding="utf-8") as file:
+                    file.write(contenido_nota)
+
+                # Abrir el archivo en el bloc de notas
+                os.startfile(file_path)
+
+                bot_response = f"Nota de texto creada. Abriendo el documento..."
+            else:
+                bot_response = "Por favor, escribe algo después de 'nota de texto' para crear la nota."
+        else:
+            # Buscar una respuesta automática en el diccionario
+            bot_response = next(
+                (respuestas_bot[key] for key in respuestas_bot if message in key),
+                "Lo siento, no entiendo esa pregunta."
+            )
+
         for keys, response in respuestas_bot.items():
             if message in keys:
                 bot_response = response
@@ -153,14 +249,13 @@ class Chat(QMainWindow):
             
             # Establecer el contenido completo con HTML
             self.chat_display.setHtml(new_content)
+
+            self.chat_display.moveCursor(QTextCursor.End) 
             
             # Limpiar el cuadro de entrada
             self.message_input.clear()
 
-
-
             # Aquí podrías agregar lógica para simular una respuesta automática o procesar el mensaje
-
 
         # Añadir el layout de contenido principal al layout de la ventana
         # self.layout.addLayout(self.main_content_layout)
