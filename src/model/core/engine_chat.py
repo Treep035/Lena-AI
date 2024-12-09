@@ -9,7 +9,7 @@ def process_message(self, message):
             ("hola", "buenas", "hi"): "¡Hola! ¿Cómo estás?",
             ("bien", "muy bien", "excelente"): "Me alegro de que todo vaya bien.",
             ("adiós", "bye", "hasta luego"): "¡Hasta luego! Espero verte pronto.",
-            ("¿cómo estás?", "que tal estas?", "cómo te encuentras"): "Estoy aquí para ayudarte. ¿En qué puedo asistirte?",
+            ("¿cómo estás?", "que tal estas?", "que tal", "cómo te encuentras"): "Estoy aquí para ayudarte. ¿En qué puedo asistirte?",
             ("gracias", "thank you"): "¡De nada! Siempre a tu servicio.",
         }
 
@@ -22,6 +22,19 @@ def process_message(self, message):
             "excel": "excel",  # Abre Microsoft Excel
             "powerpoint": "powerpnt", # Abre Microsoft PowerPoint
         }
+
+        adivinanzas = [
+            {"pregunta": "Blanca por dentro, verde por fuera. Si quieres que te lo diga, espera.", "respuesta": "La pera"},
+            {"pregunta": "Tengo agujas, pero no pincho; paso el tiempo, pero no me quejo.", "respuesta": "El reloj"},
+            {"pregunta": "Soy un rey y vivo en el mar. Todos me temen, pero no me pueden capturar.", "respuesta": "El tiburón"},
+            {"pregunta": "Cuanto más lavo, más sucio está. ¿Qué es?", "respuesta": "El agua"},
+            {"pregunta": "Vuela sin alas, silba sin boca. ¿Qué es?", "respuesta": "El viento"},
+            {"pregunta": "Tiene cabeza, pero no cerebro; tiene boca, pero no habla. ¿Qué es?", "respuesta": "El ajo"},
+            {"pregunta": "Oro parece, plata no es. ¿Qué es?", "respuesta": "El plátano"},
+            {"pregunta": "Cuanto más grande es, menos se ve. ¿Qué es?", "respuesta": ("La oscuridad", "oscuridad")},
+            {"pregunta": "No es ni humano ni animal, pero tiene corazón. ¿Qué es?", "respuesta": "La alcachofa"},
+            {"pregunta": "Soy redondo y siempre estoy en el cielo, pero nunca me caigo. ¿Qué soy?", "respuesta": "El sol"}
+        ]
 
         # Comprobar si el mensaje comienza con "busca"
         if any(form in message for form in ["busca", "busques", "buscases", "buscar"]):
@@ -40,6 +53,28 @@ def process_message(self, message):
             except StopIteration:
                 bot_response = "No entendí qué buscar. Por favor, intenta de nuevo."
 
+        elif any(form in message for form in ["adivinanza", "adivinanzas", "acertijo", "acertijos"]):
+            # Dividir el mensaje en palabras y encontrar la posición de la forma del verbo
+            palabras = message.split()
+            try:
+                # Encontrar el índice de cualquiera de las formas del verbo
+                indice_busca = next(i for i, word in enumerate(palabras) if word in ["adivinanza", "adivinanzas", "acertijo", "acertijos"])
+                # Combinar las palabras después de la forma del verbo para formar la consulta
+                self.adivinanza_actual = random.choice(adivinanzas)
+
+                bot_response = f"Adivinanza: {self.adivinanza_actual['pregunta']}"
+            except StopIteration:
+                bot_response = "No entendí qué es lo que quieres. Por favor, intenta de nuevo."
+
+        elif self.adivinanza_actual is not None:
+            if any(message.lower() == respuesta.lower() for respuesta in (self.adivinanza_actual["respuesta"] if isinstance(self.adivinanza_actual["respuesta"], tuple) else [self.adivinanza_actual["respuesta"]])):
+                bot_response = "¡Correcto! ¡Eres un genio!"
+            else:
+                bot_response = f"Incorrecto. La respuesta es: {self.adivinanza_actual['respuesta']}"
+
+            self.adivinanza_actual = None
+
+        # Abrir programas
         elif message.startswith("abre"):
             programa = message[5:].strip()  # Obtener el texto después de "abre"
             if programa in programas_disponibles:
@@ -51,6 +86,7 @@ def process_message(self, message):
             else:
                 bot_response = f"No conozco el programa '{programa}'. Por favor, verifica el nombre."
 
+        # Jugar cara o cruz
         elif message.startswith("cara o cruz"):
             resultado = random.choice(["Cara", "Cruz"])
             bot_response = f"El resultado es: {resultado}."

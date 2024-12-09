@@ -30,6 +30,7 @@ class Chat(QMainWindow):
         super().__init__()
 
         self.jugando_piedra_papel_tijeras = False
+        self.adivinanza_actual = None
 
         # Layout principal
         self.layout = QVBoxLayout()
