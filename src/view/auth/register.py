@@ -75,7 +75,7 @@ class Register(QMainWindow):
         self.toggle_button.clicked.connect(self.toggle_password_visibility)
         
         self.date_birthdate = QDateEdit()
-        image_path = os.path.abspath("./calendarblack.png")
+        image_path = os.path.abspath("./src/resources/images/calendar/black/calendarblack.png")
         if not os.path.exists(image_path):
             print(f"¡La imagen no se encuentra en la ruta: {image_path}!")
         self.date_birthdate.setStyleSheet("""
