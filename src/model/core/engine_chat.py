@@ -2,6 +2,8 @@ import webbrowser
 import os
 import random
 import re
+import requests
+from dotenv import load_dotenv
 
 def process_message(self, message):
         # Diccionario de respuestas automáticas
@@ -34,6 +36,18 @@ def process_message(self, message):
             {"pregunta": "Cuanto más grande es, menos se ve. ¿Qué es?", "respuesta": ("La oscuridad", "oscuridad")},
             {"pregunta": "No es ni humano ni animal, pero tiene corazón. ¿Qué es?", "respuesta": "La alcachofa"},
             {"pregunta": "Soy redondo y siempre estoy en el cielo, pero nunca me caigo. ¿Qué soy?", "respuesta": "El sol"}
+        ]
+
+        chistes = [
+            "¿Por qué los pájaros no usan Facebook? Porque ya tienen Twitter.",
+            "¿Qué le dice un jardinero a otro? ¡Qué planta!",
+            "¿Qué le dice un árbol a otro? ¡Qué pasa, tronco!",
+            "¿Qué le dice un pez a otro pez? ¡Nada!",
+            "¿Qué le dice una iguana a su hermana gemela? ¡Iguanita!",
+            "¿Qué le dice un huevo a otro huevo? ¡Huevo hermano!",
+            "¿Por qué los pájaros no usan WhatsApp? Porque ya tienen Line.",
+            "¿Qué le dice un semáforo a otro? ¡No me mires, que me pongo rojo!",
+            "¿Qué le dice una impresora a otra? ¡Eres la hoja de mi vida!",
         ]
 
         # Comprobar si el mensaje comienza con "busca"
@@ -74,8 +88,11 @@ def process_message(self, message):
 
             self.adivinanza_actual = None
 
+        elif any(form in message for form in ["chiste", "chistes"]):
+            bot_response = random.choice(chistes)
+
         # Abrir programas
-        elif message.startswith("abre"):
+        elif any(form in message for form in ["abre"]):
             programa = message[5:].strip()  # Obtener el texto después de "abre"
             if programa in programas_disponibles:
                 try:
@@ -87,7 +104,7 @@ def process_message(self, message):
                 bot_response = f"No conozco el programa '{programa}'. Por favor, verifica el nombre."
 
         # Jugar cara o cruz
-        elif message.startswith("cara o cruz"):
+        elif any(form in message for form in ["cara o cruz"]):
             resultado = random.choice(["Cara", "Cruz"])
             bot_response = f"El resultado es: {resultado}."
 
@@ -119,9 +136,9 @@ def process_message(self, message):
             else:
                 bot_response = "Por favor, elige entre 'piedra', 'papel' o 'tijeras'."
 
-        elif message.lower().startswith("nota de texto"):
+        elif any(form in message for form in ["nota de texto"]):
             # Extraer el contenido de la nota
-            contenido_nota = message[13:].strip()  # Quita "nota de texto"
+            contenido_nota = message.lower().split("nota de texto", 1)[1].strip()
             if contenido_nota:
                 documents_path = os.path.join(os.path.expanduser("~"))
                 # Crear un archivo de texto
@@ -148,7 +165,50 @@ def process_message(self, message):
                     bot_response = "Hubo un error al calcular la expresión."
             else:
                 bot_response = "No encontré una expresión matemática válida en tu mensaje."
+
+        elif re.search(r'clima\s+(?:de|en)?\s*(\w+)', message.lower()):
+            match = re.search(r'clima\s+(?:de|en)?\s*(\w+)', message.lower())
+            city = match.group(1)
+            load_dotenv()
+            api_key_climate = os.getenv('API_KEY_CLIMATE')
+
+            def obtener_clima(city, api_key_climate):
+                # URL base de la API de OpenWeatherMap para obtener el clima
+                url = f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key_climate}&units=metric&lang=es'
                 
+                # Hacer la solicitud GET
+                response = requests.get(url)
+                
+                # Verificar si la solicitud fue exitosa
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    # Extraer información relevante del JSON
+                    temperatura = data['main']['temp']
+                    descripcion = data['weather'][0]['description']
+                    humedad = data['main']['humidity']
+                    viento = data['wind']['speed']
+                    
+                    # Mostrar los resultados
+                    climate = f"{temperatura}°C, {descripcion}, Humedad: {humedad}%, Viento: {viento} m/s"
+                    print(f"Clima en {city.capitalize()}:")
+                    print(f"Temperatura: {temperatura}°C")
+                    print(f"Descripción: {descripcion}")
+                    print(f"Humedad: {humedad}%")
+                    print(f"Velocidad del viento: {viento} m/s")
+                else:
+                    print(f"No se pudo obtener información para {city}. Código de error: {response.status_code}")
+                    climate = None
+                
+                return climate
+
+            climate = obtener_clima(city, api_key_climate)
+
+            if climate:
+                bot_response = f"El clima en {city} es: {climate}"
+            else:
+                bot_response = f"No se pudo obtener el clima para {city}."
+
         else:
             # Buscar una respuesta automática en el diccionario
             bot_response = next(

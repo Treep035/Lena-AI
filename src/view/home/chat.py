@@ -102,13 +102,18 @@ class Chat(QMainWindow):
         self.send_button.setIconSize(QSize(18, 18))
 
         self.send_button.setStyleSheet("""
-            background-color: #3F556B;
-            border: none;
-            border-radius: 25px;  /* Esto hace que el botón sea circular */
-            width: 55px;  /* Tamaño del botón */
-            height: 55px;  /* Tamaño del botón */
-            margin-bottom: 3px;
-            margin-right: 5px;
+            QPushButton {
+                background-color: #3F556B;
+                border: none;
+                border-radius: 25px;  /* Esto hace que el botón sea circular */
+                width: 55px;  /* Tamaño del botón */
+                height: 55px;  /* Tamaño del botón */
+                margin-bottom: 3px;
+                margin-right: 5px;
+            }
+            QPushButton:hover {
+                background-color: #364758;  /* Color al pasar el cursor */
+            }
         """)
         self.send_button.setCursor(QCursor(Qt.PointingHandCursor))
 
