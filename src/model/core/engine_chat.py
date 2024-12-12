@@ -1,4 +1,5 @@
 import webbrowser
+import wikipedia
 import os
 import random
 import re
@@ -23,6 +24,79 @@ def process_message(self, message):
             "word": "winword",  # Microsoft Word en Windows
             "excel": "excel",  # Abre Microsoft Excel
             "powerpoint": "powerpnt", # Abre Microsoft PowerPoint
+            "onenote": "onenote",  # Abre Microsoft OneNote
+            "outlook": "outlook",  # Abre Microsoft Outlook
+            "paint": "mspaint",  # Abre Paint en Windows
+            "panel de control": "control",  # Abre el Panel de Control en Windows
+            "cmd": "cmd",  # Abre el Símbolo del Sistema en Windows
+            "powershell": "powershell",  # Abre PowerShell en Windows
+
+            # Herramientas del sistema
+            "administrador de tareas": "taskmgr",
+            "panel de control": "control",
+            "símbolo del sistema": "cmd",
+            "powershell": "powershell",
+            "herramientas del sistema": "msconfig",
+            "información del sistema": "msinfo32",
+            "registro de windows": "regedit",
+
+            # Aplicaciones de oficina
+            "onenote": "onenote",
+            "microsoft access": "msaccess",
+            "libreoffice writer": "soffice --writer",
+            "libreoffice calc": "soffice --calc",
+            "google docs": "https://docs.google.com",
+
+            # Aplicaciones de navegación e internet
+            "mozilla firefox": "firefox",
+            "microsoft edge": "msedge",
+            "google chrome": "chrome",
+            "opera": "opera",
+            "skype": "skype",
+            "discord": "discord",
+            "zoom": "zoom",
+            "teams": "teams",
+
+            # Aplicaciones multimedia
+            "reproductor de música": "wmplayer",
+            "vlc media player": "vlc",
+            "spotify": "spotify",
+            "audacity": "audacity",
+            "galería de fotos": "ms-photos:",
+            "editor de video": "moviemaker",
+
+            # Aplicaciones de diseño y edición
+            "paint": "mspaint",
+            "photoshop": "photoshop",
+            "gimp": "gimp",
+            "inkscape": "inkscape",
+            "coreldraw": "coreldraw",
+
+            # Herramientas de desarrollo
+            "visual studio code": "code",
+            "intellij idea": "idea",
+            "eclipse": "eclipse",
+            "pycharm": "pycharm",
+            "xampp": "xampp-control",
+            "git bash": "git-bash",
+
+            # Aplicaciones para juegos
+            "steam": "steam",
+            "epic games launcher": "epicgameslauncher",
+            "blizzard battle.net": "battle.net",
+            "riot client": "riotclient",
+
+            # Herramientas de comunicación y productividad
+            "slack": "slack",
+            "notion": "notion",
+            "trello": "trello",
+            "asana": "asana",
+
+            # Utilidades adicionales
+            "bloc de dibujos": "inkscape",
+            "control remoto": "teamviewer",
+            "compresor de archivos": "winrar",
+            "administrador de descargas": "idman"
         }
 
         adivinanzas = [
@@ -208,6 +282,26 @@ def process_message(self, message):
                 bot_response = f"El clima en {city} es: {climate}"
             else:
                 bot_response = f"No se pudo obtener el clima para {city}."
+
+        elif any(form in message for form in ["que es", "quien es", "definición de", "que significa"]):
+            consulta = re.sub(r"(explica|qué es|definir|definición|cuál es)", "", message, flags=re.IGNORECASE).strip()
+            try:
+                wikipedia.set_lang("es")  # Establece el idioma a español
+                # Busca el término en Wikipedia
+                resultados = wikipedia.search(consulta)
+                if resultados:
+                    # Obtén el resumen del primer resultado
+                    resumen = wikipedia.summary(resultados[0], sentences=2)  # Resumen de 3 frases
+                    resumen_limpio = re.sub(r'\[\d+\]', '', resumen)
+                    bot_response = f"{resumen_limpio}"
+                else:
+                    bot_response = "No encontré información sobre eso en Wikipedia."
+            except wikipedia.exceptions.DisambiguationError as e:
+                bot_response = f"La consulta es ambigua. Quizás quisiste decir: {', '.join(e.options[:5])}."
+            except wikipedia.exceptions.PageError:
+                bot_response = "No se encontró una página relacionada en Wikipedia."
+            except Exception as e:
+                bot_response = f"Hubo un error al buscar en Wikipedia: {str(e)}"
 
         else:
             # Buscar una respuesta automática en el diccionario

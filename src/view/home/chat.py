@@ -14,7 +14,7 @@ from PyQt5.QtWidgets import (
     QSizePolicy
 )
 from PyQt5.QtGui import QFont, QPixmap, QTextCursor, QIcon, QCursor
-from PyQt5.QtCore import Qt, QEvent, QDate, pyqtSignal, QSize
+from PyQt5.QtCore import Qt, QEvent, QDate, pyqtSignal, QSize, QTimer
 
 import random
 import webbrowser
@@ -126,39 +126,56 @@ class Chat(QMainWindow):
     def send_message(self):
         original_message = self.message_input.text()
         message = original_message.strip().lower()  # Convertir el mensaje a minúsculas y quitar espacios
-        bot_response = process_message_controller(self, message)
-        
+
         if message:
             # Crear el mensaje del usuario alineado a la derecha
             user_message = f"""
-                <div style='text-align: right; margin-right: 75px;'>
-                    <strong>User</strong><br>
-                    <div style='background-color: #2C3E50; padding: 10px; border-radius: 10px; margin-bottom: 5px; display: inline-block; max-width: 80%; word-wrap: break-word;'>
-                        {original_message}
-                    </div>
+            <div style="text-align: right; margin-right: 75px;">
+                <strong>User</strong><br>
+                <div style="
+                    margin-left: 75px;
+                    background-color: #2C3E50;
+                    background-size: cover;
+                    padding: 10px 15px;
+                    border-radius: 10px;
+                    margin-bottom: 5px;
+                    display: inline-block;
+                    max-width: 80%;
+                    word-wrap: break-word;
+                    text-align: left;
+                    overflow-wrap: break-word;
+                    white-space: pre-wrap;
+                    padding-left: 10px;
+                    margin-bottom: 20px;"><span style="display: block; margin-left: 0;">{original_message}</span>
                 </div>
-                """
-            
-            # Respuesta automática según el mensaje
-            bot_message = f"""
-            <div style='text-align: left; direction: ltr;'>
-                <img src='src/resources/images/lenachat.png' alt='Foto de Lena' style='width: 30px; height: 30px; vertical-align: middle; margin-right: 10px; margin-left: -30px;'>
-                <strong>Lena</strong><br>
-                <div style='margin-left: 40px;'>{bot_response}</div>
             </div>
             """
             
-            # Combinar ambos mensajes en el chat
             current_content = self.chat_display.toHtml()
-            new_content = current_content + user_message + bot_message
-            
-            # Establecer el contenido completo con HTML
-            self.chat_display.setHtml(new_content)
+            self.chat_display.setHtml(current_content + user_message)
+            self.chat_display.moveCursor(QTextCursor.End)
 
-            self.chat_display.moveCursor(QTextCursor.End) 
-            
-            # Limpiar el cuadro de entrada
             self.message_input.clear()
+
+            QTimer.singleShot(100, lambda: self.show_bot_response(message))
+
+    def show_bot_response(self, message):
+        bot_response = process_message_controller(self, message)
+
+        # Mostrar mensaje del bot
+        bot_message = f"""
+<div style='text-align: left; direction: ltr; display: flex; align-items: center;'>
+    <img src='src/resources/images/lenachat.png' alt='Foto de Lena' style='width: 30px; height: 30px; vertical-align: middle; margin-right: 10px;'>
+    <strong>Lena</strong>
+</div>
+<div style='margin-left: 80px; margin-right: 80px; text-align: left; padding: 10px 15px; border-radius: 10px; margin-bottom: 20px;'>
+{bot_response}
+</div>
+"""
+
+        current_content = self.chat_display.toHtml()
+        self.chat_display.setHtml(current_content + bot_message)
+        self.chat_display.moveCursor(QTextCursor.End)
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter:
