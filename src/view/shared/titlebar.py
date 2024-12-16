@@ -88,13 +88,15 @@ class TitleBar(QWidget):
             elif event.type() == QEvent.Leave:
                 source.setStyleSheet("background-color: #2C3E50; color: white; border: none; font-size: 16px; padding-bottom: 5px;")
             elif event.type() == QEvent.MouseButtonPress:
-                source.setStyleSheet("background-color: #1F2A38; color: white; border: none; font-size: 16px; padding-bottom: 5px;")
+                if event.button() == Qt.LeftButton:
+                    source.setStyleSheet("background-color: #1F2A38; color: white; border: none; font-size: 16px; padding-bottom: 5px;")
             elif event.type() == QEvent.MouseButtonRelease:
-                source.setStyleSheet("background-color: #2C3E50; color: white; border: none; font-size: 16px; padding-bottom: 5px;")
-                if source == self.minimize_button:
-                    self.minimize()  # Minimizar la ventana si se libera el botón de minimizar
-                elif source == self.close_button:
-                    self.window().close()  # Cerrar la ventana correctamente
+                if event.button() == Qt.LeftButton:
+                    source.setStyleSheet("background-color: #2C3E50; color: white; border: none; font-size: 16px; padding-bottom: 5px;")
+                    if source == self.minimize_button:
+                        self.minimize()  # Minimizar la ventana si se libera el botón de minimizar
+                    elif source == self.close_button:
+                        self.window().close()  # Cerrar la ventana correctamente
         return super().eventFilter(source, event)
 
     def minimize(self):

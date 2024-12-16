@@ -13,6 +13,7 @@ from view.shared.bottombar import BottomBar
 from view.home.home import Home
 from view.home.chat import Chat
 from view.home.account import Account
+from view.home.configuration import Configuration
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -71,6 +72,7 @@ class MainWindow(QMainWindow):
         self.home_widget = Home()
         self.chat_widget = Chat()
         self.account_widget = Account()
+        self.configuration_widget = Configuration()
 
         self.bottom_bar = BottomBar()
         
@@ -81,13 +83,17 @@ class MainWindow(QMainWindow):
         self.layout.addWidget(self.bottom_bar)
 
         self.bottom_bar.viewChanged.connect(self.showOption)
+        self.account_widget.viewChanged.connect(self.showOption)
 
     def showOption(self, view_name):
+        print(f"Vista cambiada a: {view_name}")
         if view_name == "home":
             self.layout.removeWidget(self.chat_widget)
             self.chat_widget.hide()
             self.layout.removeWidget(self.account_widget)
             self.account_widget.hide()
+            self.layout.removeWidget(self.configuration_widget)
+            self.configuration_widget.hide()
             self.layout.removeWidget(self.bottom_bar)
             self.bottom_bar.hide()
             self.layout.addWidget(self.home_widget)
@@ -99,6 +105,8 @@ class MainWindow(QMainWindow):
             self.home_widget.hide()
             self.layout.removeWidget(self.account_widget)
             self.account_widget.hide()
+            self.layout.removeWidget(self.configuration_widget)
+            self.configuration_widget.hide()
             self.layout.removeWidget(self.bottom_bar)
             self.bottom_bar.hide()
             self.layout.addWidget(self.chat_widget)
@@ -110,10 +118,21 @@ class MainWindow(QMainWindow):
             self.home_widget.hide()
             self.layout.removeWidget(self.chat_widget)
             self.chat_widget.hide()
+            self.layout.removeWidget(self.configuration_widget)
+            self.configuration_widget.hide()
             self.layout.removeWidget(self.bottom_bar)
             self.bottom_bar.hide()
             self.layout.addWidget(self.account_widget)
             self.account_widget.show()
+            self.layout.addWidget(self.bottom_bar)
+            self.bottom_bar.show()
+        elif view_name == "configuration":
+            self.layout.removeWidget(self.account_widget)
+            self.account_widget.hide()
+            self.layout.removeWidget(self.bottom_bar)
+            self.bottom_bar.hide()
+            self.layout.addWidget(self.configuration_widget)
+            self.configuration_widget.show()
             self.layout.addWidget(self.bottom_bar)
             self.bottom_bar.show()
 

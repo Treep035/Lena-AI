@@ -33,7 +33,7 @@ class BottomBar(QWidget):
         # Imagen 1: Home (izquierda)
         self.home_label = QLabel()
         self.setup_icon(self.home_label, "whitehome", active = True)
-        self.home_label.mousePressEvent = lambda event: self.change_view("home")
+        self.home_label.mousePressEvent = lambda event: self.on_icon_click(event, "home")
         hbox.addWidget(self.home_label)
 
         # Espaciador izquierdo (entre Home y Chat)
@@ -45,7 +45,7 @@ class BottomBar(QWidget):
         # Imagen 2: Chat (centro)
         self.chat_label = QLabel()
         self.setup_icon(self.chat_label, "whitechat", active = False)
-        self.chat_label.mousePressEvent = lambda event: self.change_view("chat")
+        self.chat_label.mousePressEvent = lambda event: self.on_icon_click(event, "chat")
         hbox.addWidget(self.chat_label)
 
         # Espaciador derecho (entre Chat y Account)
@@ -57,7 +57,7 @@ class BottomBar(QWidget):
         # Imagen 3: Account (derecha)
         self.account_label = QLabel()
         self.setup_icon(self.account_label, "whiteaccount", active = False)
-        self.account_label.mousePressEvent = lambda event: self.change_view("account")
+        self.account_label.mousePressEvent = lambda event: self.on_icon_click(event, "account")
         hbox.addWidget(self.account_label)
 
         # Espaciador final (con color de fondo) para el margen derecho
@@ -88,6 +88,11 @@ class BottomBar(QWidget):
         self.setup_icon(self.home_label, "whitehome", active_icon == "home")
         self.setup_icon(self.chat_label, "whitechat", active_icon == "chat")
         self.setup_icon(self.account_label, "whiteaccount", active_icon == "account")
+    
+    def on_icon_click(self, event, view_name):
+        """Maneja el clic en un ícono, verificando si es clic izquierdo."""
+        if event.button() == Qt.LeftButton:  # Solo actuar en clic izquierdo
+            self.change_view(view_name)
 
     def change_view(self, view_name):
         """Cambia la vista y emite una señal con el nombre de la vista seleccionada."""

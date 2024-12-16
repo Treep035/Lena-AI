@@ -22,8 +22,10 @@ from io import BytesIO
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
 from controller.account_load_controller import account_picture_load_controller, account_username_load_controller
+from view.shared.bottombar import BottomBar
 
 class Account(QMainWindow):
+    viewChanged = pyqtSignal(str)
     def __init__(self):
         super().__init__()
 
@@ -65,6 +67,7 @@ class Account(QMainWindow):
             }
         """)
         self.configuration_button.setCursor(QCursor(Qt.PointingHandCursor))
+        self.configuration_button.mousePressEvent = lambda event: self.on_icon_click(event, "configuration")
         self.configure_content_layout.addWidget(self.configuration_button, alignment=Qt.AlignLeft)
 
         # Crear un layout para los otros widgets
@@ -109,3 +112,12 @@ class Account(QMainWindow):
         # Cargar texto desde la base de datos
         username = account_username_load_controller()
         self.username_label.setText(username)
+
+    def on_icon_click(self, event, view_name):
+        """Maneja el clic en un ícono, verificando si es clic izquierdo."""
+        if event.button() == Qt.LeftButton:  # Solo actuar en clic izquierdo
+            self.change_view(view_name)
+        
+    def change_view(self, view_name):
+        """Cambia la vista y emite una señal con el nombre de la vista seleccionada."""
+        self.viewChanged.emit(view_name)  # Emitir señal para que `MainWindow` cambie la vista
