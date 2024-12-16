@@ -13,8 +13,11 @@ from PyQt5.QtWidgets import (
     QSpacerItem,
     QSizePolicy
 )
-from PyQt5.QtGui import QFont, QPixmap, QTextCursor, QIcon, QCursor
-from PyQt5.QtCore import Qt, QEvent, QDate, pyqtSignal, QSize, QTimer
+from PyQt5.QtGui import QFont, QPixmap, QTextCursor, QIcon, QCursor, QPainter, QPainterPath
+from PyQt5.QtCore import Qt, QEvent, QDate, pyqtSignal, QSize, QTimer, QBuffer, QIODevice
+
+import base64
+from io import BytesIO
 
 import random
 import webbrowser
@@ -24,6 +27,7 @@ import re
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
 from src.controller.process_message_controller import process_message_controller
+from src.controller.account_load_controller import account_username_load_controller, account_picture_load_controller
 
 class Chat(QMainWindow):
     def __init__(self):
@@ -127,29 +131,49 @@ class Chat(QMainWindow):
         original_message = self.message_input.text()
         message = original_message.strip().lower()  # Convertir el mensaje a minúsculas y quitar espacios
 
+        username = account_username_load_controller()
+
+        user_image_path = account_picture_load_controller()
+        pixmap = QPixmap(user_image_path)
+        size = 52
+        pixmap = pixmap.scaled(size, size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+
+        circular_pixmap = QPixmap(size, size)
+        circular_pixmap.fill(Qt.transparent)  # Fondo transparente
+
+        # Pintar la imagen en un círculo
+        painter = QPainter(circular_pixmap)
+        painter.setRenderHint(QPainter.Antialiasing)
+        path = QPainterPath()
+        path.addEllipse(0, 0, size, size)
+        painter.setClipPath(path)
+        painter.drawPixmap(0, 0, pixmap)
+        painter.end()
+
+        # Crear un buffer en memoria
+        buffer = QBuffer()
+        buffer.open(QIODevice.ReadWrite)
+
+        # Guardar la imagen en el buffer
+        circular_pixmap.save(buffer, format='PNG')
+
+        # Asegúrate de mover el puntero al principio del buffer
+        buffer.seek(0)
+
+        # Leer los datos completos del buffer y convertirlo a base64
+        img_base64 = base64.b64encode(buffer.read(buffer.size())).decode('utf-8')
+
         if message:
             # Crear el mensaje del usuario alineado a la derecha
             user_message = f"""
-            <div style="text-align: right; margin-right: 75px;">
-                <strong>User</strong><br>
-                <div style="
-                    margin-left: 75px;
-                    background-color: #2C3E50;
-                    background-size: cover;
-                    padding: 10px 15px;
-                    border-radius: 10px;
-                    margin-bottom: 5px;
-                    display: inline-block;
-                    max-width: 80%;
-                    word-wrap: break-word;
-                    text-align: left;
-                    overflow-wrap: break-word;
-                    white-space: pre-wrap;
-                    padding-left: 10px;
-                    margin-bottom: 20px;"><span style="display: block; margin-left: 0;">{original_message}</span>
-                </div>
-            </div>
-            """
+<div style="text-align: right; direction: rtl; display: flex; align-items: center; justify-content: flex-end; margin-right: 35px;">
+    <strong>{username}</strong>
+    <img src='data:image/png;base64,{img_base64}' alt='Foto de Lena' style='width: 30px; height: 30px; vertical-align: middle; margin-left: 10px;'>
+</div>
+<div style="margin-right: 75px; text-align: left; padding: 10px 15px; border-radius: 10px; margin-bottom: 20px; background-color: #2C3E50; display: inline-block; max-width: 80%; word-wrap: break-word; overflow-wrap: break-word; white-space: pre-wrap;">
+    <span style="display: block; margin-left: 0;">{original_message}</span>
+</div>
+"""
             
             current_content = self.chat_display.toHtml()
             self.chat_display.setHtml(current_content + user_message)
