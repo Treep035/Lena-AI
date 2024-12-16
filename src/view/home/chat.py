@@ -38,7 +38,7 @@ class Chat(QMainWindow):
 
         # Configurar el widget central
         self.central_widget = QWidget()
-        self.central_widget.setStyleSheet("background-color: #19232d;")
+        self.central_widget.setStyleSheet("background-color: #233240;")
         self.setCentralWidget(self.central_widget)
         self.central_widget.setLayout(self.layout)
 
@@ -50,7 +50,7 @@ class Chat(QMainWindow):
         self.chat_display.setStyleSheet("""
             QTextEdit {
                 color: white; 
-                background-color: #19232D; 
+                background-color: #233240; 
                 border: none;
                 font-size: 15px;
             }
