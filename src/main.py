@@ -84,6 +84,7 @@ class MainWindow(QMainWindow):
 
         self.bottom_bar.viewChanged.connect(self.showOption)
         self.account_widget.viewChanged.connect(self.showOption)
+        self.configuration_widget.viewChanged.connect(self.showOption)
 
     def showOption(self, view_name):
         print(f"Vista cambiada a: {view_name}")

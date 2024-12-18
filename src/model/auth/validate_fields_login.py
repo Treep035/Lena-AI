@@ -10,7 +10,8 @@ def validate_fields_login(self):
         no_fields = True
         invalid_fields = False
         logged_in = False
-        return no_fields, invalid_fields, logged_in
+        id_user = "0"
+        return no_fields, invalid_fields, logged_in, id_user
     
     connection = None
     cursor = None

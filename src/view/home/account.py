@@ -41,7 +41,7 @@ class Account(QMainWindow):
         self.central_widget.setLayout(self.layout)
 
         self.configure_content_layout = QVBoxLayout()
-        self.configure_content_layout.setContentsMargins(25, 50, 75, 0)
+        self.configure_content_layout.setContentsMargins(15, 50, 75, 0)
         self.configure_content_layout.setSpacing(0)
 
         self.layout.addLayout(self.configure_content_layout)

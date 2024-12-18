@@ -82,6 +82,7 @@ class Chat(QMainWindow):
         
         # Crear un layout horizontal para el cuadro de entrada y el botón de envío
         self.input_layout = QHBoxLayout()
+        self.input_layout.setContentsMargins(0, 15, 0, 0)
         
         # Crear el cuadro de entrada para nuevos mensajes
         self.message_input = QLineEdit(self)
