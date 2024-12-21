@@ -22,8 +22,16 @@ from model.database.db_connection import connect_to_db
 from model.token.auth_token import get_auth_token_from_request
 
 class Configuration(QMainWindow):
+    _instance = None
+
+    @staticmethod
+    def get_instance():
+        if Configuration._instance is None:
+            Configuration._instance = Configuration()
+        return Configuration._instance
+
     viewChanged = pyqtSignal(str)
-    profilePictureChanged = pyqtSignal()
+    account_picture_update_signal = pyqtSignal()
     def __init__(self):
         super().__init__()
 
@@ -130,7 +138,7 @@ class Configuration(QMainWindow):
         self.options_content_layout.addWidget(self.profilePictureButton, alignment=Qt.AlignCenter)
 
         # Conectar el clic al método que abrirá el diálogo
-        self.profilePictureButton.mousePressEvent = self.open_file_dialog
+        self.profilePictureButton.mousePressEvent = lambda event: self.open_file_dialog(event)
         # self.uno.mousePressEvent(self.open_file_dialog)
         
 
@@ -490,7 +498,8 @@ class Configuration(QMainWindow):
         if file_path:  # Si se seleccionó un archivo
             print(f"Imagen seleccionada: {file_path}")
             save_image_to_db(file_path)
-            self.profilePictureChanged.emit()
+            print("Emitiendo señal account_picture_update_signal")
+            self.account_picture_update_signal.emit()
 
 # Método para guardar la imagen en MySQL
 def save_image_to_db(file_path):

@@ -23,6 +23,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '.
 
 from controller.account_load_controller import account_picture_load_controller, account_username_load_controller
 from view.shared.bottombar import BottomBar
+from view.home.configuration import Configuration
 
 class Account(QMainWindow):
     viewChanged = pyqtSignal(str)
@@ -104,6 +105,9 @@ class Account(QMainWindow):
         # Establecer el pixmap circular en la QLabel
         self.profile_pic_label.setPixmap(circular_pixmap)
 
+        self.configuracion = Configuration.get_instance()
+        self.configuracion.account_picture_update_signal.connect(self.update_profile_picture)
+
         self.username_label = QLabel()
         self.username_label.setAlignment(Qt.AlignCenter)
         self.username_label.setStyleSheet("color: white; font-size: 36px;")
@@ -113,6 +117,36 @@ class Account(QMainWindow):
         username = account_username_load_controller()
         self.username_label.setText(username)
 
+    def update_profile_picture(self):
+        profile_pic_label_updated = QLabel()
+        profile_pic_label_updated.setAlignment(Qt.AlignCenter)
+        profile_pic_label_updated.setFixedSize(150, 150)  # Tamaño fijo para la imagen
+
+        user_image_path = account_picture_load_controller()
+        pixmap = QPixmap(user_image_path)
+        size = 150
+        pixmap = pixmap.scaled(size, size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+
+        circular_pixmap = QPixmap(size, size)
+        circular_pixmap.fill(Qt.transparent)  # Fondo transparente
+
+        # Pintar la imagen en un círculo
+        painter = QPainter(circular_pixmap)
+        painter.setRenderHint(QPainter.Antialiasing)
+        path = QPainterPath()
+        path.addEllipse(0, 0, size, size)
+        painter.setClipPath(path)
+        painter.drawPixmap(0, 0, pixmap)
+        painter.end()
+
+        # Establecer el pixmap circular en la QLabel
+        profile_pic_label_updated.setPixmap(circular_pixmap)
+
+        self.layout.replaceWidget(self.profile_pic_label, profile_pic_label_updated)
+        self.profile_pic_label.deleteLater()
+
+        self.profile_pic_label = profile_pic_label_updated
+        
     def on_icon_click(self, event, view_name):
         """Maneja el clic en un ícono, verificando si es clic izquierdo."""
         if event.button() == Qt.LeftButton:  # Solo actuar en clic izquierdo

@@ -72,7 +72,7 @@ class MainWindow(QMainWindow):
         self.home_widget = Home()
         self.chat_widget = Chat()
         self.account_widget = Account()
-        self.configuration_widget = Configuration()
+        self.configuration_widget = Configuration.get_instance()
 
         self.bottom_bar = BottomBar()
         
