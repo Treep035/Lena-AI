@@ -136,6 +136,18 @@ class MainWindow(QMainWindow):
             self.configuration_widget.show()
             self.layout.addWidget(self.bottom_bar)
             self.bottom_bar.show()
+        elif view_name == "logout":
+            self.layout.removeWidget(self.home_widget)
+            self.home_widget.hide()
+            self.layout.removeWidget(self.chat_widget)
+            self.chat_widget.hide()
+            self.layout.removeWidget(self.account_widget)
+            self.account_widget.hide()
+            self.layout.removeWidget(self.configuration_widget)
+            self.configuration_widget.hide()
+            self.layout.removeWidget(self.bottom_bar)
+            self.bottom_bar.hide()
+            self.show_login()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

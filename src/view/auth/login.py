@@ -158,7 +158,12 @@ class Login(QMainWindow):
             insert_tokens_controller(id_user, auth_token, refresh_token, auth_token_expiration, refresh_token_expiration)
             QTimer.singleShot(3000, self.remove_error_message)
             QTimer.singleShot(3000, self.switch_to_home.emit)
+            QTimer.singleShot(3000, lambda: self.clear_fields())
             
+    def clear_fields(self):
+        self.text_email.clear()
+        self.text_password.clear()
+    
     def remove_error_message(self):
         self.main_content_layout.removeWidget(self.status_label)
         self.status_label.hide()

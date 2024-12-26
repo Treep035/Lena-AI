@@ -21,6 +21,9 @@ from controller.account_load_controller import account_picture_load_controller
 from model.database.db_connection import connect_to_db
 from model.token.auth_token import get_auth_token_from_request
 from controller.save_configuration_controller import save_configuration_controller
+from view.home.change_name import change_name
+from view.home.change_password import change_password
+from controller.sign_out_controller import sign_out_controller
 
 class Configuration(QMainWindow):
     _instance = None
@@ -30,7 +33,7 @@ class Configuration(QMainWindow):
         if Configuration._instance is None:
             Configuration._instance = Configuration()
         return Configuration._instance
-
+    
     viewChanged = pyqtSignal(str)
     account_picture_update_signal = pyqtSignal()
     def __init__(self):
@@ -206,7 +209,7 @@ class Configuration(QMainWindow):
 
         # Cambiar el cursor a un puntero de mano al pasar sobre el widget
         self.profileUsernameButton.setCursor(QCursor(Qt.PointingHandCursor))
-
+        self.profileUsernameButton.mousePressEvent = lambda event: change_name(event, self)
         # Añadir el widget al layout principal
         self.options_content_layout.addWidget(self.profileUsernameButton, alignment=Qt.AlignCenter)
 
@@ -274,6 +277,7 @@ class Configuration(QMainWindow):
 
         # Cambiar el cursor a un puntero de mano al pasar sobre el widget
         self.profilePasswordButton.setCursor(QCursor(Qt.PointingHandCursor))
+        self.profilePasswordButton.mousePressEvent = lambda event: change_password(event, self)
 
         # Añadir el widget al layout principal
         self.options_content_layout.addWidget(self.profilePasswordButton, alignment=Qt.AlignCenter)
@@ -476,9 +480,17 @@ class Configuration(QMainWindow):
         # Cambiar el cursor a un puntero de mano al pasar sobre el widget
         self.profileSignOutButton.setCursor(QCursor(Qt.PointingHandCursor))
 
+        # Luego, asigna este método al evento
+        self.profileSignOutButton.mousePressEvent = lambda event: self.on_sign_out(event, "logout")
+        
         # Añadir el widget al layout principal
         self.options_content_layout.addWidget(self.profileSignOutButton, alignment=Qt.AlignCenter)
-    
+
+    def on_sign_out(self, event, view_name):
+        if event.button() == Qt.LeftButton:  # Solo actuar en clic izquierdo
+            sign_out_controller()
+            self.change_view(view_name)
+
     def on_icon_click(self, event, view_name):
         """Maneja el clic en un ícono, verificando si es clic izquierdo."""
         if event.button() == Qt.LeftButton:  # Solo actuar en clic izquierdo
