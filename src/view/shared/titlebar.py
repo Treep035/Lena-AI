@@ -10,6 +10,9 @@ from PyQt5.QtCore import Qt, QEvent
 
 import sys
 import os
+from controller.theme_controller import get_theme_controller
+from resources.styles.theme import change_theme
+from view.home.configuration import Configuration
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))
 
 # from src.controller.titlebar_controller import mousePressEvent, mouseMoveEvent, eventFilter, minimize
@@ -17,6 +20,10 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '.
 class TitleBar(QWidget):
     def __init__(self):
         super().__init__()
+
+        theme = get_theme_controller()
+        theme_color = change_theme(self, theme)
+
         self.setFixedHeight(35)
         # self.setStyleSheet("background-color: #4CAF50; border-bottom-right-radius: 10px;")
 
@@ -32,26 +39,26 @@ class TitleBar(QWidget):
 
         # Etiqueta de título
         self.title_label = QLabel("Lena AI")
-        self.title_label.setStyleSheet("color: white; font-size: 16px;")
+        self.title_label.setStyleSheet(f"color: {theme_color[3]}; font-size: 16px;")
 
         hbox.addWidget(self.image_label)
         hbox.addWidget(self.title_label)
 
-        spacer = QWidget()
-        spacer.setStyleSheet("background-color: #2C3E50;")  # Color de la barra
-        spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)  # Hace que el espaciador expanda
-        hbox.addWidget(spacer)
+        self.spacer = QWidget()
+        self.spacer.setStyleSheet(f"background-color: {theme_color[0]};")  # Color de la barra
+        self.spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)  # Hace que el espaciador expanda
+        hbox.addWidget(self.spacer)
 
         # Botones de la barra de título
         self.minimize_button = QPushButton("−")
         self.minimize_button.setFixedSize(40, 40)
-        self.minimize_button.setStyleSheet("color: white; border: none; font-size: 16px; padding-bottom: 5px;")
+        self.minimize_button.setStyleSheet(f"color: {theme_color[3]}; border: none; font-size: 16px; padding-bottom: 5px;")
         self.minimize_button.clicked.connect(self.minimize)
         self.minimize_button.installEventFilter(self)  # Instalar filtro de eventos
 
         self.close_button = QPushButton("✕")
         self.close_button.setFixedSize(40, 40)
-        self.close_button.setStyleSheet("color: white; border: none; font-size: 16px; padding-bottom: 5px;")
+        self.close_button.setStyleSheet(f"color: {theme_color[3]}; border: none; font-size: 16px; padding-bottom: 5px;")
         self.close_button.clicked.connect(self.close)
         self.close_button.installEventFilter(self)  # Instalar filtro de eventos
 
@@ -59,16 +66,20 @@ class TitleBar(QWidget):
         hbox.addWidget(self.minimize_button)
         hbox.addWidget(self.close_button)
 
-        self.setStyleSheet("""
-            QWidget {
-                background-color: #2C3E50;
-            }
-            QLabel {
+        self.setStyleSheet(f"""
+            QWidget {{
+                background-color: {theme_color[0]};
+            }}
+            QLabel {{
                 padding-left: 10px;
-            }
+            }}
         """)
 
         self.start = None
+
+        self.configuracion = Configuration.get_instance()
+        self.configuracion.theme_changed.connect(self.update_theme_titlebar)
+        self.configuracion.restart_theme.connect(self.restart_theme_titlebar)
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
@@ -101,3 +112,37 @@ class TitleBar(QWidget):
 
     def minimize(self):
         self.window().showMinimized()
+    
+    def update_theme_titlebar(self):
+        theme = get_theme_controller()
+        theme_color = change_theme(self, theme)
+        
+        self.title_label.setStyleSheet(f"color: {theme_color[3]}; font-size: 16px;")
+        self.spacer.setStyleSheet(f"background-color: {theme_color[0]};")  # Color de la barra
+        self.minimize_button.setStyleSheet(f"color: {theme_color[3]}; border: none; font-size: 16px; padding-bottom: 5px;")
+        self.close_button.setStyleSheet(f"color: {theme_color[3]}; border: none; font-size: 16px; padding-bottom: 5px;")
+        self.setStyleSheet(f"""
+            QWidget {{
+                background-color: {theme_color[0]};
+            }}
+            QLabel {{
+                padding-left: 10px;
+            }}
+        """)
+
+    def restart_theme_titlebar(self):
+        theme = "default"
+        theme_color = change_theme(self, theme)
+
+        self.title_label.setStyleSheet(f"color: {theme_color[3]}; font-size: 16px;")
+        self.spacer.setStyleSheet(f"background-color: {theme_color[0]};")  # Color de la barra
+        self.minimize_button.setStyleSheet(f"color: {theme_color[3]}; border: none; font-size: 16px; padding-bottom: 5px;")
+        self.close_button.setStyleSheet(f"color: {theme_color[3]}; border: none; font-size: 16px; padding-bottom: 5px;")
+        self.setStyleSheet(f"""
+            QWidget {{
+                background-color: {theme_color[0]};
+            }}
+            QLabel {{
+                padding-left: 10px;
+            }}
+        """)

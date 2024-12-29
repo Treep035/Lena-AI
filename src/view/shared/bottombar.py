@@ -11,12 +11,19 @@ from PyQt5.QtCore import Qt, pyqtSignal
 
 import sys
 import os
+from resources.styles.theme import change_theme
+from controller.theme_controller import get_theme_controller
+from view.home.configuration import Configuration
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
 class BottomBar(QWidget):
     viewChanged = pyqtSignal(str)
     def __init__(self):
         super().__init__()
+
+        theme = get_theme_controller()
+        theme_color = change_theme(self, theme)
+
         self.setFixedHeight(75)
 
         # Configuración del layout de la barra inferior
@@ -25,10 +32,10 @@ class BottomBar(QWidget):
         hbox.setSpacing(0)
 
         # Espaciador inicial (con color de fondo) para el margen izquierdo
-        left_margin_spacer = QWidget()
-        left_margin_spacer.setFixedWidth(40)  # Ancho del margen izquierdo
-        left_margin_spacer.setStyleSheet("background-color: #2C3E50;")  # Color de fondo del espaciador
-        hbox.addWidget(left_margin_spacer)
+        self.left_margin_spacer = QWidget()
+        self.left_margin_spacer.setFixedWidth(40)  # Ancho del margen izquierdo
+        self.left_margin_spacer.setStyleSheet(f"background-color: {theme_color[0]};")  # Color de fondo del espaciador
+        hbox.addWidget(self.left_margin_spacer)
 
         # Imagen 1: Home (izquierda)
         self.home_label = QLabel()
@@ -37,10 +44,10 @@ class BottomBar(QWidget):
         hbox.addWidget(self.home_label)
 
         # Espaciador izquierdo (entre Home y Chat)
-        left_spacer = QWidget()
-        left_spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
-        left_spacer.setStyleSheet("background-color: #2C3E50;")  # Color de fondo del espaciador
-        hbox.addWidget(left_spacer)
+        self.left_spacer = QWidget()
+        self.left_spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        self.left_spacer.setStyleSheet(f"background-color: {theme_color[0]};")  # Color de fondo del espaciador
+        hbox.addWidget(self.left_spacer)
 
         # Imagen 2: Chat (centro)
         self.chat_label = QLabel()
@@ -49,10 +56,10 @@ class BottomBar(QWidget):
         hbox.addWidget(self.chat_label)
 
         # Espaciador derecho (entre Chat y Account)
-        right_spacer = QWidget()
-        right_spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
-        right_spacer.setStyleSheet("background-color: #2C3E50;")  # Color de fondo del espaciador
-        hbox.addWidget(right_spacer)
+        self.right_spacer = QWidget()
+        self.right_spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        self.right_spacer.setStyleSheet(f"background-color: {theme_color[0]};")  # Color de fondo del espaciador
+        hbox.addWidget(self.right_spacer)
 
         # Imagen 3: Account (derecha)
         self.account_label = QLabel()
@@ -61,20 +68,39 @@ class BottomBar(QWidget):
         hbox.addWidget(self.account_label)
 
         # Espaciador final (con color de fondo) para el margen derecho
-        right_margin_spacer = QWidget()
-        right_margin_spacer.setFixedWidth(40)  # Ancho del margen derecho
-        right_margin_spacer.setStyleSheet("background-color: #2C3E50;")  # Color de fondo del espaciador
-        hbox.addWidget(right_margin_spacer)
+        self.right_margin_spacer = QWidget()
+        self.right_margin_spacer.setFixedWidth(40)  # Ancho del margen derecho
+        self.right_margin_spacer.setStyleSheet(f"background-color: {theme_color[0]};")  # Color de fondo del espaciador
+        hbox.addWidget(self.right_margin_spacer)
 
         # Estilo de la barra
-        self.setStyleSheet("""
-            QWidget {
-                background-color: #2C3E50;
-            }
-            QLabel {
-                padding-left: 10px;
-            }
-        """)
+        self.setStyleSheet(f"""
+        QWidget {{
+            background-color: {theme_color[0]};
+        }}
+        QLabel {{
+            padding-left: 10px;
+        }}
+    """)
+
+        self.configuracion = Configuration.get_instance()
+        self.configuracion.theme_changed.connect(self.update_theme_bottombar)
+
+    def update_theme_bottombar(self):
+        theme = get_theme_controller()
+        theme_color = change_theme(self, theme)
+        self.left_margin_spacer.setStyleSheet(f"background-color: {theme_color[0]};")
+        self.left_spacer.setStyleSheet(f"background-color: {theme_color[0]};")
+        self.right_spacer.setStyleSheet(f"background-color: {theme_color[0]};")
+        self.right_margin_spacer.setStyleSheet(f"background-color: {theme_color[0]};")
+        self.setStyleSheet(f"""
+        QWidget {{
+            background-color: {theme_color[0]};
+        }}
+        QLabel {{
+            padding-left: 10px;
+        }}
+    """)
 
     def setup_icon(self, label, icon_name, active):
         """Configura un QLabel como un icono clickeable, con estado activo/inactivo."""

@@ -22,6 +22,8 @@ from io import BytesIO
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
 from controller.account_load_controller import account_picture_load_controller, account_username_load_controller
+from controller.theme_controller import get_theme_controller
+from resources.styles.theme import change_theme
 from view.shared.bottombar import BottomBar
 from view.home.configuration import Configuration
 
@@ -30,6 +32,9 @@ class Account(QMainWindow):
     def __init__(self):
         super().__init__()
 
+        theme = get_theme_controller()
+        theme_color = change_theme(self, theme)
+
         # Layout principal
         self.layout = QVBoxLayout()
         self.layout.setContentsMargins(0, 0, 0, 0)
@@ -37,7 +42,7 @@ class Account(QMainWindow):
 
         # Configurar el widget central
         self.central_widget = QWidget()
-        self.central_widget.setStyleSheet("background-color: #233240;")
+        self.central_widget.setStyleSheet(f"background-color: {theme_color[1]};")
         self.setCentralWidget(self.central_widget)
         self.central_widget.setLayout(self.layout)
 
@@ -48,24 +53,24 @@ class Account(QMainWindow):
         self.layout.addLayout(self.configure_content_layout)
 
         self.configuration_button = QPushButton(self)
-        configuration_icon = QPixmap("src/resources/images/configuration/white/configurationblanco.png")  # Asegúrate de usar la ruta correcta a tu imagen
-        self.configuration_button.setIcon(QIcon(configuration_icon))
+        self.configuration_icon = QPixmap(f"src/resources/images/configuration/{theme_color[3]}/configuration.png")  # Asegúrate de usar la ruta correcta a tu imagen
+        self.configuration_button.setIcon(QIcon(self.configuration_icon))
 
         self.configuration_button.setIconSize(QSize(40, 40))
 
-        self.configuration_button.setStyleSheet("""
-            QPushButton {
-                background-color: #2C3E50;
+        self.configuration_button.setStyleSheet(f"""
+            QPushButton {{
+                background-color: {theme_color[0]};
                 border: none;
                 border-radius: 37px;  /* Esto hace que el botón sea circular */
                 width: 75px;  /* Tamaño del botón */
                 height: 75px;  /* Tamaño del botón */
                 margin-bottom: 3px;
                 margin-right: 5px;
-            }
-            QPushButton:hover {
-                background-color: #364758;  /* Color al pasar el cursor */
-            }
+            }}
+            QPushButton:hover {{
+                background-color: {theme_color[2]};  /* Color al pasar el cursor */
+            }}
         """)
         self.configuration_button.setCursor(QCursor(Qt.PointingHandCursor))
         self.configuration_button.mousePressEvent = lambda event: self.on_icon_click(event, "configuration")
@@ -102,6 +107,9 @@ class Account(QMainWindow):
         painter.drawPixmap(0, 0, pixmap)
         painter.end()
 
+        self.configuracion = Configuration.get_instance()
+        self.configuracion.theme_changed.connect(self.update_theme_account)
+
         # Establecer el pixmap circular en la QLabel
         self.profile_pic_label.setPixmap(circular_pixmap)
 
@@ -110,7 +118,7 @@ class Account(QMainWindow):
 
         self.username_label = QLabel()
         self.username_label.setAlignment(Qt.AlignCenter)
-        self.username_label.setStyleSheet("color: white; font-size: 36px;")
+        self.username_label.setStyleSheet(f"color: {theme_color[3]}; font-size: 36px;")
         self.main_content_layout.addWidget(self.username_label, alignment=Qt.AlignCenter)
 
         # Cargar texto desde la base de datos
@@ -155,3 +163,34 @@ class Account(QMainWindow):
     def change_view(self, view_name):
         """Cambia la vista y emite una señal con el nombre de la vista seleccionada."""
         self.viewChanged.emit(view_name)  # Emitir señal para que `MainWindow` cambie la vista
+
+    def update_theme_account(self):
+        theme = get_theme_controller()
+        theme_color = change_theme(self, theme)
+        self.central_widget.setStyleSheet(f"background-color: {theme_color[1]};")
+
+        self.configuration_button.deleteLater()
+        self.configuration_button = QPushButton(self)
+
+        # Configurar el nuevo botón
+        self.configuration_icon = QPixmap(f"src/resources/images/configuration/{theme_color[3]}/configuration.png")
+        self.configuration_button.setIcon(QIcon(self.configuration_icon))
+        self.configuration_button.setIconSize(QSize(40, 40))
+        self.configuration_button.setStyleSheet(f"""
+            QPushButton {{
+                background-color: {theme_color[0]};
+                border: none;
+                border-radius: 37px;
+                width: 75px;
+                height: 75px;
+                margin-bottom: 3px;
+                margin-right: 5px;
+            }}
+            QPushButton:hover {{
+                background-color: {theme_color[2]};
+            }}
+        """)
+        self.configuration_button.setCursor(QCursor(Qt.PointingHandCursor))
+        self.configuration_button.mousePressEvent = lambda event: self.on_icon_click(event, "configuration")
+        self.configure_content_layout.addWidget(self.configuration_button, alignment=Qt.AlignLeft)
+        self.username_label.setStyleSheet(f"color: {theme_color[3]}; font-size: 36px;")

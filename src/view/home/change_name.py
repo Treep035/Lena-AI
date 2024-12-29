@@ -50,17 +50,17 @@ def change_name(event, parent):
 
     actual_name_input = QLineEdit()
     actual_name_input.setPlaceholderText("Nombre actual...")
-    actual_name_input.setFixedSize(300, 40)
+    actual_name_input.setFixedSize(325, 50)
     actual_name_input.setStyleSheet("border-radius: 10px; border: 1px solid #ccc; padding-left: 10px; color: white; background-color: #233240; margin-right: 25px;")
 
     modified_name_input = QLineEdit()
     modified_name_input.setPlaceholderText("Nuevo nombre...")
-    modified_name_input.setFixedSize(300, 40)
+    modified_name_input.setFixedSize(325, 50)
     modified_name_input.setStyleSheet("border-radius: 10px; border: 1px solid #ccc; padding-left: 10px; color: white; background-color: #233240; margin-right: 25px;")
 
     confirm_modified_name_input = QLineEdit()
     confirm_modified_name_input.setPlaceholderText("Confirmar nuevo nombre...")
-    confirm_modified_name_input.setFixedSize(300, 40)
+    confirm_modified_name_input.setFixedSize(325, 50)
     confirm_modified_name_input.setStyleSheet("border-radius: 10px; border: 1px solid #ccc; padding-left: 10px; color: white; background-color: #233240; margin-right: 25px;")
 
     save_changes = QPushButton("Guardar cambios")

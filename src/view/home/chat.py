@@ -18,6 +18,9 @@ from PyQt5.QtCore import Qt, QEvent, QDate, pyqtSignal, QSize, QTimer, QBuffer, 
 
 import base64
 from io import BytesIO
+from controller.theme_controller import get_theme_controller
+from resources.styles.theme import change_theme
+from view.home.configuration import Configuration
 
 import random
 import webbrowser
@@ -33,6 +36,9 @@ class Chat(QMainWindow):
     def __init__(self):
         super().__init__()
 
+        theme = get_theme_controller()
+        theme_color = change_theme(self, theme)
+
         self.jugando_piedra_papel_tijeras = False
         self.adivinanza_actual = None
 
@@ -42,7 +48,7 @@ class Chat(QMainWindow):
 
         # Configurar el widget central
         self.central_widget = QWidget()
-        self.central_widget.setStyleSheet("background-color: #233240;")
+        self.central_widget.setStyleSheet(f"background-color: {theme_color[1]}")
         self.setCentralWidget(self.central_widget)
         self.central_widget.setLayout(self.layout)
 
@@ -51,31 +57,31 @@ class Chat(QMainWindow):
         # self.main_content_layout.setContentsMargins(75, 10, 75, 125)  # Márgenes para el contenido
 
         self.chat_display = QTextEdit(self)
-        self.chat_display.setStyleSheet("""
-            QTextEdit {
+        self.chat_display.setStyleSheet(f"""
+            QTextEdit {{
                 color: white; 
-                background-color: #233240; 
+                background-color: {theme_color[1]}; 
                 border: none;
                 font-size: 15px;
-            }
-            QScrollBar:vertical {
-                background: #2C3E50;
+            }}
+            QScrollBar:vertical {{
+                background: {theme_color[0]};
                 width: 10px;
                 margin: 0px;
                 border-radius: 5px;
-            }
-            QScrollBar::handle:vertical {
-                background: #3F556B;
+            }}
+            QScrollBar::handle:vertical {{
+                background: {theme_color[2]};
                 min-height: 20px;
                 border-radius: 5px;
-            }
-            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+            }}
+            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{
                 background: none;
                 height: 0px;
-            }
-            QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+            }}
+            QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {{
                 background: none;
-            }
+            }}
         """)
         self.chat_display.setReadOnly(True)  # No se puede escribir directamente aquí
         self.layout.addWidget(self.chat_display)
@@ -86,9 +92,9 @@ class Chat(QMainWindow):
         
         # Crear el cuadro de entrada para nuevos mensajes
         self.message_input = QLineEdit(self)
-        self.message_input.setStyleSheet("""
+        self.message_input.setStyleSheet(f"""
             color: white; 
-            background-color: #3F556B; 
+            background-color: {theme_color[2]}; 
             border: none;
             border-top-right-radius: 20px;  /* Solo redondear la esquina superior derecha */
             border-bottom-right-radius: 20px;  /* Solo redondear la esquina inferior derecha */ 
@@ -106,19 +112,19 @@ class Chat(QMainWindow):
         
         self.send_button.setIconSize(QSize(18, 18))
 
-        self.send_button.setStyleSheet("""
-            QPushButton {
-                background-color: #3F556B;
+        self.send_button.setStyleSheet(f"""
+            QPushButton {{
+                background-color: {theme_color[2]};
                 border: none;
                 border-radius: 25px;  /* Esto hace que el botón sea circular */
                 width: 55px;  /* Tamaño del botón */
                 height: 55px;  /* Tamaño del botón */
                 margin-bottom: 3px;
                 margin-right: 5px;
-            }
-            QPushButton:hover {
-                background-color: #364758;  /* Color al pasar el cursor */
-            }
+            }}
+            QPushButton:hover {{
+                background-color: {theme_color[0]};  /* Color al pasar el cursor */
+            }}
         """)
         self.send_button.setCursor(QCursor(Qt.PointingHandCursor))
 
@@ -127,8 +133,15 @@ class Chat(QMainWindow):
         
         # Añadir el layout de entrada al layout principal
         self.layout.addLayout(self.input_layout)
+
+        self.configuracion = Configuration.get_instance()
+        self.configuracion.theme_changed.connect(self.update_theme_chat)
         
     def send_message(self):
+
+        theme = get_theme_controller()
+        theme_color = change_theme(self, theme)
+
         original_message = self.message_input.text()
         message = original_message.strip().lower()  # Convertir el mensaje a minúsculas y quitar espacios
 
@@ -171,7 +184,7 @@ class Chat(QMainWindow):
     <strong>{username}</strong>
     <img src='data:image/png;base64,{img_base64}' alt='Foto de Lena' style='width: 30px; height: 30px; vertical-align: middle; margin-left: 10px;'>
 </div>
-<div style="margin-right: 75px; text-align: left; padding: 10px 15px; border-radius: 10px; margin-bottom: 20px; background-color: #2C3E50; display: inline-block; max-width: 80%; word-wrap: break-word; overflow-wrap: break-word; white-space: pre-wrap;">
+<div style="margin-right: 75px; text-align: left; padding: 10px 15px; border-radius: 10px; margin-bottom: 20px; background-color: {theme_color[0]}; display: inline-block; max-width: 80%; word-wrap: break-word; overflow-wrap: break-word; white-space: pre-wrap;">
     <span style="display: block; margin-left: 0;">{original_message}</span>
 </div>
 """
@@ -185,6 +198,8 @@ class Chat(QMainWindow):
             QTimer.singleShot(100, lambda: self.show_bot_response(message))
 
     def show_bot_response(self, message):
+        theme = get_theme_controller()
+        theme_color = change_theme(self, theme)
         bot_response = process_message_controller(self, message)
 
         # Mostrar mensaje del bot
@@ -212,3 +227,59 @@ class Chat(QMainWindow):
                 self.send_message()
         else:
             super().keyPressEvent(event)  # Dejar que otros eventos se manejen normalmente
+
+    def update_theme_chat(self):
+        theme = get_theme_controller()
+        theme_color = change_theme(self, theme)
+        self.central_widget.setStyleSheet(f"background-color: {theme_color[1]}")
+        self.chat_display.setStyleSheet(f"""
+            QTextEdit {{
+                color: white; 
+                background-color: {theme_color[1]}; 
+                border: none;
+                font-size: 15px;
+            }}
+            QScrollBar:vertical {{
+                background: {theme_color[0]};
+                width: 10px;
+                margin: 0px;
+                border-radius: 5px;
+            }}
+            QScrollBar::handle:vertical {{
+                background: {theme_color[2]};
+                min-height: 20px;
+                border-radius: 5px;
+            }}
+            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{
+                background: none;
+                height: 0px;
+            }}
+            QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {{
+                background: none;
+            }}
+        """)
+
+        self.message_input.setStyleSheet(f"""
+            color: white; 
+            background-color: {theme_color[2]}; 
+            border: none;
+            border-top-right-radius: 20px;  /* Solo redondear la esquina superior derecha */
+            border-bottom-right-radius: 20px;  /* Solo redondear la esquina inferior derecha */ 
+            padding-left: 12px;
+            margin-bottom: 3px;
+        """)
+
+        self.send_button.setStyleSheet(f"""
+            QPushButton {{
+                background-color: {theme_color[2]};
+                border: none;
+                border-radius: 25px;  /* Esto hace que el botón sea circular */
+                width: 55px;  /* Tamaño del botón */
+                height: 55px;  /* Tamaño del botón */
+                margin-bottom: 3px;
+                margin-right: 5px;
+            }}
+            QPushButton:hover {{
+                background-color: {theme_color[0]};  /* Color al pasar el cursor */
+            }}
+        """)

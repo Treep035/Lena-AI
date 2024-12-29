@@ -1,41 +1,48 @@
 import speech_recognition as sr
-import pyttsx3
+from gtts import gTTS
+from playsound import playsound
 from datetime import datetime
 import webbrowser
+import os
 
-# Inicializar el motor de texto a voz
-engine = pyttsx3.init()
-
-# Función para hablar al inicio
+# Función para hablar usando gTTS
 def speak(text):
-    engine.say(text)
-    engine.runAndWait()
+    try:
+        tts = gTTS(text=text, lang='es')
+        audio_file = "temp_audio.mp3"  # Archivo temporal
+        tts.save(audio_file)
+        playsound(audio_file)
+        os.remove(audio_file)  # Eliminar el archivo después de reproducir
+    except Exception as e:
+        print(f"Error al generar la voz: {e}")
 
+# Función para transcribir el audio a texto
 def transcribe_audio_to_text():
     recognizer = sr.Recognizer()
     with sr.Microphone() as source:
+        recognizer.energy_threshold = 4000
+        recognizer.dynamic_energy_adjustment = True
         print("Escuchando...")
-
-        recognizer.timeout = 10
-        recognizer.energy_threshold = 500
-
+        recognizer.adjust_for_ambient_noise(source)  # Ajustar para ruido ambiental
         try:
-            audio = recognizer.listen(source, timeout=5)  # Añadir un timeout para evitar quedarse esperando demasiado
-            text = recognizer.recognize_sphinx(audio, language="es")  # Usar pocketsphinx para el reconocimiento offline
+            audio = recognizer.listen(source)  # Capturar el audio
+            # Convertir el audio a texto usando Google Web Speech API
+            text = recognizer.recognize_google(audio, language="es-ES")
             print(f"Texto detectado: {text}")
             return text
         except sr.UnknownValueError:
-            raise ValueError("No se pudo entender lo que dijiste.")  # Lanzar un error si no se entiende el audio
+            print("No se pudo entender el audio.")
+            speak("Lo siento, no entendí lo que dijiste. Por favor, intenta de nuevo.")
         except sr.RequestError as e:
-            raise ConnectionError(f"Error con el servicio de reconocimiento de voz: {e}")  # Lanzar un error si hay un problema
-        except Exception as e:
-            raise e  # Para capturar cualquier otro tipo de error que pueda ocurrir
+            print(f"Error con el servicio de reconocimiento: {e}")
+            speak("Hubo un problema con el servicio de reconocimiento.")
+        return ""
 
+# Función para generar respuestas
 def generate_response(prompt):
-    # Procesar la entrada con if-elif
     response = ""
     if "hola" in prompt.lower():
-        response = "¡Hola! ¿Cómo puedo ayudarte?"
+        response = "¡Hola! ¿Cómo podría ayudarte?"
     elif "hora" in prompt.lower():
         now = datetime.now()
         response = f"La hora actual es {now.strftime('%H:%M:%S')}"
@@ -44,22 +51,21 @@ def generate_response(prompt):
     elif "busca" in prompt.lower():
         search_query = prompt.lower().replace("busca ", "")
         search_url = f"https://www.google.com/search?q={search_query}"
-        webbrowser.open(search_url)  # Abrir la búsqueda en el navegador
+        webbrowser.open(search_url)
         response = f"Buscando resultados para: {search_query}"
     else:
         response = "Lo siento, no entendí eso. ¿Puedes intentar de nuevo?"
     return response
 
-if __name__ == "__main__":
+def start():
     # Hablar al inicio
-    speak("Hola, estoy listo para escucharte.")
+    speak("Hola, estoy lista para atenderte. Pregúntame lo que necesites.")
     
     while True:
         try:
             user_input = transcribe_audio_to_text()
             if user_input:
                 response = generate_response(user_input)
-                response = ""
                 print(f"IA: {response}")
                 speak(response)  # Responder también con voz
                 if "adiós" in user_input.lower():

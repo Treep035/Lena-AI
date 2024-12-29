@@ -12,18 +12,17 @@ from PyQt5.QtWidgets import (
     QMessageBox,
     QSpacerItem,
     QSizePolicy,
-    QFileDialog
+    QFileDialog,
+    QComboBox
 )
 from PyQt5.QtGui import QFont, QPixmap, QTextCursor, QIcon, QCursor, QPainter, QPainterPath
 from PyQt5.QtCore import Qt, QEvent, QDate, pyqtSignal, QSize, QTimer, QBuffer, QIODevice
 
-from controller.account_load_controller import account_picture_load_controller
-from model.database.db_connection import connect_to_db
-from model.token.auth_token import get_auth_token_from_request
 from controller.save_configuration_controller import save_configuration_controller
 from view.home.change_name import change_name
 from view.home.change_password import change_password
 from controller.sign_out_controller import sign_out_controller
+from controller.theme_controller import update_theme_controller
 
 class Configuration(QMainWindow):
     _instance = None
@@ -35,7 +34,9 @@ class Configuration(QMainWindow):
         return Configuration._instance
     
     viewChanged = pyqtSignal(str)
+    restart_theme = pyqtSignal()
     account_picture_update_signal = pyqtSignal()
+    theme_changed = pyqtSignal()
     def __init__(self):
         super().__init__()
 
@@ -354,7 +355,8 @@ class Configuration(QMainWindow):
         self.profileThemeButton.setMaximumHeight(65)
 
         # Crear el layout principal de self.uno
-        main_layout = QHBoxLayout(self.profileThemeButton)
+        main_layout_final = QHBoxLayout(self.profileThemeButton)
+        main_layout = QHBoxLayout()
 
         # Crear QLabel para mostrar la imagen
         change_profile_pic_icon = QPixmap("src/resources/images/theme/white/temablanco.png")
@@ -367,9 +369,6 @@ class Configuration(QMainWindow):
                 color: white;  /* Cambiar color del texto */
                 background-color: transparent;  /* Evitar que tenga fondo */
                 padding-left: 10px;  /* Alinear texto con la imagen */
-            }
-            QLabel:hover {
-                background-color: transparent;  /* El fondo sigue siendo transparente */
             }
         """)
 
@@ -386,12 +385,59 @@ class Configuration(QMainWindow):
                 background-color: transparent;  /* Evitar que tenga fondo */
                 padding-left: 10px;  /* Alinear texto con la imagen */
             }
-            QLabel:hover {
-                background-color: transparent;  /* El fondo sigue siendo transparente */
-            }
         """)
 
         main_layout.addWidget(label)
+
+        main_layout_2 = QHBoxLayout()
+
+        combobox_theme = QComboBox()
+        combobox_theme.addItems(["Default", "Light", "Dark", "Pink", "Special"])  # Agregar elementos
+        main_layout_2.setAlignment(Qt.AlignRight)
+        combobox_theme.setStyleSheet("""
+            QComboBox {
+                color: white;  /* Cambiar color del texto */
+                background-color: #2C3E50;  /* Evitar que tenga fondo */
+                border-radius: 5px;  /* Bordes redondeados */
+                padding: 5px;  /* Espaciado interno */
+            }
+            QComboBox:hover {
+                background-color: rgba(255, 255, 255, 0.1);  /* El fondo sigue siendo transparente */
+            }
+            QComboBox::drop-down {
+            }
+            QComboBox::down-arrow {
+            }
+            QComboBox QAbstractItemView {
+                background-color: #34495E;  /* Color de fondo del menú desplegable */
+                color: white;  /* Color del texto en el menú */
+                selection-background-color: #2C3E50;
+                selection-color: white;  /* Color del texto del elemento seleccionado */
+                border-radius: 5px;  /* Bordes redondeados */
+                outline: none;  /* Evitar el contorno */
+                padding: 5px;
+                spacing: 10px;  /* Espaciado entre las opciones */
+            }
+            QComboBox QAbstractItemView::item {
+                padding-left: 15px;  /* Espaciado interno izquierdo */
+                padding-right: 15px;  /* Espaciado interno derecho */
+                padding-top: 10px;  /* Espaciado interno superior */
+                padding-bottom: 10px;  /* Espaciado interno inferior */
+            }
+        """)
+        combobox_theme.setCursor(QCursor(Qt.PointingHandCursor))
+
+        self.themes = {
+            0: "default",   # Opción 1
+            1: "light",    # Opción 2
+            2: "dark",  # Opción 3
+            3: "pink",
+            4: "special"
+        }
+
+        combobox_theme.currentIndexChanged.connect(self.selection_changed)
+
+        main_layout_2.addWidget(combobox_theme)
 
         # Estilo del QWidget
         self.profileThemeButton.setStyleSheet("""
@@ -405,13 +451,10 @@ class Configuration(QMainWindow):
                 text-align: left;
                 padding-left: 15px;
             }
-            QWidget:hover {
-                background-color: #364758;
-            }
         """)
-
         # Cambiar el cursor a un puntero de mano al pasar sobre el widget
-        self.profileThemeButton.setCursor(QCursor(Qt.PointingHandCursor))
+        main_layout_final.addLayout(main_layout)
+        main_layout_final.addLayout(main_layout_2)
 
         # Añadir el widget al layout principal
         self.options_content_layout.addWidget(self.profileThemeButton, alignment=Qt.AlignCenter)
@@ -489,6 +532,7 @@ class Configuration(QMainWindow):
     def on_sign_out(self, event, view_name):
         if event.button() == Qt.LeftButton:  # Solo actuar en clic izquierdo
             sign_out_controller()
+            self.restart_theme.emit()
             self.change_view(view_name)
 
     def on_icon_click(self, event, view_name):
@@ -513,3 +557,8 @@ class Configuration(QMainWindow):
             save_configuration_controller(file_path)
             print("Emitiendo señal account_picture_update_signal")
             self.account_picture_update_signal.emit()
+
+    def selection_changed(self, index):
+        theme_option = self.themes.get(index, "Desconocido")
+        update_theme_controller(theme_option)
+        self.theme_changed.emit()

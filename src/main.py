@@ -75,6 +75,8 @@ class MainWindow(QMainWindow):
         self.configuration_widget = Configuration.get_instance()
 
         self.bottom_bar = BottomBar()
+
+        self.title_bar.update_theme_titlebar()
         
         self.layout.addWidget(self.home_widget)
         

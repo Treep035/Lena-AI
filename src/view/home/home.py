@@ -15,14 +15,25 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtGui import QFont, QPixmap, QTextCursor, QIcon, QCursor
 from PyQt5.QtCore import Qt, QEvent, QDate, pyqtSignal
-
+import threading
 import sys
 import os
+from resources.styles.theme import change_theme
+from controller.theme_controller import get_theme_controller
+from controller.process_voice_message_controller import process_voice_message_controller
+from view.home.configuration import Configuration
+from view.shared.titlebar import TitleBar
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
-class Home(QMainWindow):
+class Home(QMainWindow):        
     def __init__(self):
         super().__init__()
+        
+        title_bar = TitleBar()
+        title_bar.update_theme_titlebar()
+
+        theme = get_theme_controller()
+        theme_color = change_theme(self, theme)
 
         # Layout principal
         self.layout = QVBoxLayout()
@@ -30,9 +41,12 @@ class Home(QMainWindow):
 
         # Configurar el widget central
         self.central_widget = QWidget()
-        self.central_widget.setStyleSheet("background-color: #233240;")
+        self.central_widget.setStyleSheet(f"background-color: {theme_color[1]};")
         self.setCentralWidget(self.central_widget)
         self.central_widget.setLayout(self.layout)
+
+        self.configuracion = Configuration.get_instance()
+        self.configuracion.theme_changed.connect(self.update_theme_home)
 
         # Crear un layout para los otros widgets
         self.main_content_layout = QVBoxLayout()
@@ -44,9 +58,24 @@ class Home(QMainWindow):
         self.label.setAlignment(Qt.AlignCenter)
         self.label.setStyleSheet("margin-top: 100px;")
         self.label.setCursor(QCursor(Qt.PointingHandCursor))
+        self.label.mousePressEvent = self.on_mouse_press 
 
         # Añadir widgets al layout principal
         self.main_content_layout.addWidget(self.label)
 
         # Añadir el layout de contenido principal al layout de la ventana
         self.layout.addLayout(self.main_content_layout)
+
+    def on_mouse_press(self, event):
+        if event.button() == Qt.LeftButton:
+            start_assistant(self)
+
+    def update_theme_home(self):
+        theme = get_theme_controller()
+        theme_color = change_theme(self, theme)
+        self.central_widget.setStyleSheet(f"background-color: {theme_color[1]};")
+
+def start_assistant(self):
+    # Ejecutar `start` en un hilo separado
+    thread = threading.Thread(target=process_voice_message_controller, daemon=True)
+    thread.start()

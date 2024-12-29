@@ -11,9 +11,29 @@ def process_message(self, message):
         respuestas_bot = {
             ("hola", "buenas", "hi"): "¡Hola! ¿Cómo estás?",
             ("bien", "muy bien", "excelente"): "Me alegro de que todo vaya bien.",
-            ("adiós", "bye", "hasta luego"): "¡Hasta luego! Espero verte pronto.",
-            ("¿cómo estás?", "que tal estas?", "que tal", "cómo te encuentras"): "Estoy aquí para ayudarte. ¿En qué puedo asistirte?",
+            ("adios", "bye", "hasta luego"): "¡Hasta luego! Espero verte pronto.",
+            ("cómo estas", "que tal estas", "que tal", "como te encuentras"): "Estoy aquí para ayudarte. ¿En qué puedo asistirte?",
             ("gracias", "thank you"): "¡De nada! Siempre a tu servicio.",
+            ("que haces", "azul"): "Hola, aquí esperando para ayudarte.",
+            ("que puedes hacer"): "Puedo responder preguntas, ayudarte con tareas, recomendar cosas o simplemente charlar contigo. ¡Tú dime!",
+            ("eres humano"): "No, soy una inteligencia artificial, pero puedo hacer muchas cosas para ayudarte como si fuera un asistente humano.",
+            ("tienes emociones"): "No tengo emociones como los humanos, pero estoy diseñado para responder de manera amigable y útil.",
+            ("cual es el sentido de la vida"): "Esa es una gran pregunta. Algunos dicen que es encontrar la felicidad; otros, ayudar a los demás. ¿Tú qué piensas?",
+            ("recuerdame algo mañana"): "No puedo recordar cosas automáticamente, pero te sugiero usar una aplicación de recordatorios. ¡Puedo ayudarte a configurarla si quieres!",
+            ("como estas hecho"): "Estoy hecho de líneas de código y algoritmos diseñados para entenderte y ayudarte.",
+            ("me puedes enseñar algo"): "¡Claro! ¿Qué te gustaría aprender? Puedo explicarte cosas de tecnología, idiomas, matemáticas y mucho más.",
+            ("cuentame algo interesante"): "¿Sabías que los pulpos tienen tres corazones? Dos bombean sangre a las branquias y uno al resto del cuerpo.",
+            ("estoy aburrido"): "¿Qué te parece si jugamos a algo, te cuento un dato curioso o vemos una idea para un nuevo proyecto?",
+            ("me siento triste"): "Lo siento mucho. A veces hablar con alguien o hacer algo que te guste puede ayudarte. Estoy aquí si necesitas apoyo.",
+            ("que puedo hacer para ser mas productivo"): "Intenta organizar tus tareas por prioridad, usar una técnica como Pomodoro y asegurarte de tomar descansos.",
+            ("dame un consejo"): "Nunca dejes de aprender, incluso de los errores. Cada experiencia puede ayudarte a crecer.",
+            ("que significa"): "Déjame buscarlo para darte la mejor definición.",
+            ("recomiendame algo para comer"): "¿Qué tal una pizza casera o unos tacos? ¡Siempre son una buena idea!",
+            ("te gusta"): "No tengo gustos como los humanos, pero puedo decirte por qué a la gente le encanta eso.",
+            ("que hago si me siento estresado"): "Intenta respirar profundamente, salir a caminar o escuchar música relajante.",
+            ("cuentame una historia"): "Había una vez un pequeño robot que quería aprender todo sobre los humanos.",
+            ("cual es tu color favorito"): "No tengo ojos para ver colores, pero el azul suele ser muy popular.",
+            ("puedes darme ideas para un proyecto"): "Por supuesto, ¿qué te parece un blog personal, una app sencilla o algo relacionado con tus intereses?",
         }
 
         programas_disponibles = {
@@ -305,6 +325,8 @@ def process_message(self, message):
 
         else:
             # Buscar una respuesta automática en el diccionario
+            message = message.lower()
+            message = ''.join(c for c in message if c.isalnum() or c.isspace())  # Eliminar caracteres especiales
             bot_response = next(
                 (respuestas_bot[key] for key in respuestas_bot if message in key),
                 "Lo siento, no entiendo esa pregunta."
@@ -314,5 +336,5 @@ def process_message(self, message):
             if message in keys:
                 bot_response = response
                 break
-        
+
         return bot_response
