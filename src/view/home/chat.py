@@ -93,7 +93,7 @@ class Chat(QMainWindow):
         # Crear el cuadro de entrada para nuevos mensajes
         self.message_input = QLineEdit(self)
         self.message_input.setStyleSheet(f"""
-            color: white; 
+            color: {theme_color[4]}; 
             background-color: {theme_color[2]}; 
             border: none;
             border-top-right-radius: 20px;  /* Solo redondear la esquina superior derecha */
@@ -107,7 +107,7 @@ class Chat(QMainWindow):
         
         # Crear el botón para enviar el mensaje
         self.send_button = QPushButton(self)
-        send_icon = QPixmap("src/resources/images/sendmessage/sendwhite.png")  # Reemplaza con la ruta de la imagen que deseas usar
+        send_icon = QPixmap(f"src/resources/images/{theme_color[4]}/sendmessage/sendmessage.png")  # Reemplaza con la ruta de la imagen que deseas usar
         self.send_button.setIcon(QIcon(send_icon))  # Establece la imagen como ícono
         
         self.send_button.setIconSize(QSize(18, 18))
@@ -260,7 +260,7 @@ class Chat(QMainWindow):
         """)
 
         self.message_input.setStyleSheet(f"""
-            color: white; 
+            color: {theme_color[4]}; 
             background-color: {theme_color[2]}; 
             border: none;
             border-top-right-radius: 20px;  /* Solo redondear la esquina superior derecha */
@@ -269,6 +269,10 @@ class Chat(QMainWindow):
             margin-bottom: 3px;
         """)
 
+        send_icon = QPixmap(f"src/resources/images/{theme_color[4]}/sendmessage/sendmessage.png")  # Reemplaza con la ruta de la imagen que deseas usar
+        self.send_button.setIcon(QIcon(send_icon))  # Establece la imagen como ícono
+        
+        self.send_button.setIconSize(QSize(18, 18))
         self.send_button.setStyleSheet(f"""
             QPushButton {{
                 background-color: {theme_color[2]};

@@ -39,7 +39,7 @@ class BottomBar(QWidget):
 
         # Imagen 1: Home (izquierda)
         self.home_label = QLabel()
-        self.setup_icon(self.home_label, "whitehome", active = True)
+        self.setup_icon(self.home_label, "home", active = True)
         self.home_label.mousePressEvent = lambda event: self.on_icon_click(event, "home")
         hbox.addWidget(self.home_label)
 
@@ -51,7 +51,7 @@ class BottomBar(QWidget):
 
         # Imagen 2: Chat (centro)
         self.chat_label = QLabel()
-        self.setup_icon(self.chat_label, "whitechat", active = False)
+        self.setup_icon(self.chat_label, "chat", active = False)
         self.chat_label.mousePressEvent = lambda event: self.on_icon_click(event, "chat")
         hbox.addWidget(self.chat_label)
 
@@ -63,7 +63,7 @@ class BottomBar(QWidget):
 
         # Imagen 3: Account (derecha)
         self.account_label = QLabel()
-        self.setup_icon(self.account_label, "whiteaccount", active = False)
+        self.setup_icon(self.account_label, "account", active = False)
         self.account_label.mousePressEvent = lambda event: self.on_icon_click(event, "account")
         hbox.addWidget(self.account_label)
 
@@ -101,19 +101,24 @@ class BottomBar(QWidget):
             padding-left: 10px;
         }}
     """)
+        self.setup_icon(self.home_label, "home", active=False)
+        self.setup_icon(self.chat_label, "chat", active=False)
+        self.setup_icon(self.account_label, "account", active=True)
 
     def setup_icon(self, label, icon_name, active):
         """Configura un QLabel como un icono clickeable, con estado activo/inactivo."""
-        image_path = f"src/resources/images/bottombar/{icon_name}{'_inactive' if not active else ''}.png"
+        theme = get_theme_controller()
+        theme_color = change_theme(self, theme)
+        image_path = f"src/resources/images/{theme_color[4]}/bottombar/{icon_name}{'_inactive' if not active else ''}.png"
         pixmap = QPixmap(image_path).scaled(40, 40, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         label.setPixmap(pixmap)
         label.setCursor(QCursor(Qt.PointingHandCursor))
 
     def set_active_icon(self, active_icon):
         """Cambia las imágenes de los íconos según el ícono activo."""
-        self.setup_icon(self.home_label, "whitehome", active_icon == "home")
-        self.setup_icon(self.chat_label, "whitechat", active_icon == "chat")
-        self.setup_icon(self.account_label, "whiteaccount", active_icon == "account")
+        self.setup_icon(self.home_label, "home", active_icon == "home")
+        self.setup_icon(self.chat_label, "chat", active_icon == "chat")
+        self.setup_icon(self.account_label, "account", active_icon == "account")
     
     def on_icon_click(self, event, view_name):
         """Maneja el clic en un ícono, verificando si es clic izquierdo."""

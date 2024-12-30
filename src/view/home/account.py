@@ -53,7 +53,7 @@ class Account(QMainWindow):
         self.layout.addLayout(self.configure_content_layout)
 
         self.configuration_button = QPushButton(self)
-        self.configuration_icon = QPixmap(f"src/resources/images/configuration/{theme_color[3]}/configuration.png")  # Asegúrate de usar la ruta correcta a tu imagen
+        self.configuration_icon = QPixmap(f"src/resources/images/{theme_color[4]}/configuration/configuration.png")  # Asegúrate de usar la ruta correcta a tu imagen
         self.configuration_button.setIcon(QIcon(self.configuration_icon))
 
         self.configuration_button.setIconSize(QSize(40, 40))
@@ -118,7 +118,7 @@ class Account(QMainWindow):
 
         self.username_label = QLabel()
         self.username_label.setAlignment(Qt.AlignCenter)
-        self.username_label.setStyleSheet(f"color: {theme_color[3]}; font-size: 36px;")
+        self.username_label.setStyleSheet(f"color: {theme_color[4]}; font-size: 36px;")
         self.main_content_layout.addWidget(self.username_label, alignment=Qt.AlignCenter)
 
         # Cargar texto desde la base de datos
@@ -173,7 +173,7 @@ class Account(QMainWindow):
         self.configuration_button = QPushButton(self)
 
         # Configurar el nuevo botón
-        self.configuration_icon = QPixmap(f"src/resources/images/configuration/{theme_color[3]}/configuration.png")
+        self.configuration_icon = QPixmap(f"src/resources/images/{theme_color[4]}/configuration/configuration.png")
         self.configuration_button.setIcon(QIcon(self.configuration_icon))
         self.configuration_button.setIconSize(QSize(40, 40))
         self.configuration_button.setStyleSheet(f"""
@@ -193,4 +193,4 @@ class Account(QMainWindow):
         self.configuration_button.setCursor(QCursor(Qt.PointingHandCursor))
         self.configuration_button.mousePressEvent = lambda event: self.on_icon_click(event, "configuration")
         self.configure_content_layout.addWidget(self.configuration_button, alignment=Qt.AlignLeft)
-        self.username_label.setStyleSheet(f"color: {theme_color[3]}; font-size: 36px;")
+        self.username_label.setStyleSheet(f"color: {theme_color[4]}; font-size: 36px;")

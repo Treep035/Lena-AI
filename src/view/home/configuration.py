@@ -23,6 +23,8 @@ from view.home.change_name import change_name
 from view.home.change_password import change_password
 from controller.sign_out_controller import sign_out_controller
 from controller.theme_controller import update_theme_controller
+from controller.theme_controller import get_theme_controller
+from resources.styles.theme import change_theme
 
 class Configuration(QMainWindow):
     _instance = None
@@ -40,6 +42,9 @@ class Configuration(QMainWindow):
     def __init__(self):
         super().__init__()
 
+        theme = get_theme_controller()
+        theme_color = change_theme(self, theme)
+
         # Layout principal
         self.layout = QVBoxLayout()
         self.layout.setContentsMargins(0, 0, 0, 0)
@@ -47,7 +52,7 @@ class Configuration(QMainWindow):
 
         # Configurar el widget central
         self.central_widget = QWidget()
-        self.central_widget.setStyleSheet("background-color: #233240;")
+        self.central_widget.setStyleSheet(f"background-color: {theme_color[1]};")
         self.setCentralWidget(self.central_widget)
         self.central_widget.setLayout(self.layout)
 
@@ -58,7 +63,7 @@ class Configuration(QMainWindow):
         self.layout.addLayout(self.back_content_layout)
 
         self.back_button = QPushButton(self)
-        back_button = QPixmap("src/resources/images/back/white/whiteback.png")  # Asegúrate de usar la ruta correcta a tu imagen
+        back_button = QPixmap(f"src/resources/images/{theme_color[4]}/back/back.png")  # Asegúrate de usar la ruta correcta a tu imagen
         self.back_button.setIcon(QIcon(back_button))
 
         self.back_button.setIconSize(QSize(45, 45))
@@ -83,57 +88,57 @@ class Configuration(QMainWindow):
         main_layout = QHBoxLayout(self.profilePictureButton)
 
         # Crear QLabel para mostrar la imagen
-        change_profile_pic_icon = QPixmap("src/resources/images/profile/white/profile.png")
-        change_profile_pic_icon = change_profile_pic_icon.scaled(34, 34, Qt.KeepAspectRatio)
-        image_label = QLabel()
-        image_label.setPixmap(change_profile_pic_icon)
+        self.change_profile_pic_icon_1 = QPixmap(f"src/resources/images/{theme_color[4]}/profile/profile.png")
+        self.change_profile_pic_icon_1 = self.change_profile_pic_icon_1.scaled(34, 34, Qt.KeepAspectRatio)
+        self.image_label_1 = QLabel()
+        self.image_label_1.setPixmap(self.change_profile_pic_icon_1)
 
-        image_label.setStyleSheet("""
-            QLabel {
-                color: white;  /* Cambiar color del texto */
+        self.image_label_1.setStyleSheet(f"""
+            QLabel {{
+                color: {theme_color[4]};  /* Cambiar color del texto */
                 background-color: transparent;  /* Evitar que tenga fondo */
                 padding-left: 10px;  /* Alinear texto con la imagen */
-            }
-            QLabel:hover {
+            }}
+            QLabel:hover {{
                 background-color: transparent;  /* El fondo sigue siendo transparente */
-            }
+            }}
         """)
 
         # Añadir la imagen al layout principal
-        main_layout.addWidget(image_label, alignment=Qt.AlignLeft)
+        main_layout.addWidget(self.image_label_1, alignment=Qt.AlignLeft)
 
         # Crear un layout para el texto
-        label = QLabel("Cambiar foto de perfil")
+        self.label_1 = QLabel("Cambiar foto de perfil")
         main_layout.setAlignment(Qt.AlignLeft)
 
-        label.setStyleSheet("""
-            QLabel {
-                color: white;  /* Cambiar color del texto */
+        self.label_1.setStyleSheet(f"""
+            QLabel {{
+                color: {theme_color[4]};  /* Cambiar color del texto */
                 background-color: transparent;  /* Evitar que tenga fondo */
                 padding-left: 10px;  /* Alinear texto con la imagen */
-            }
-            QLabel:hover {
+            }}
+            QLabel:hover {{
                 background-color: transparent;  /* El fondo sigue siendo transparente */
-            }
+            }}
         """)
 
-        main_layout.addWidget(label)
+        main_layout.addWidget(self.label_1)
 
         # Estilo del QWidget
-        self.profilePictureButton.setStyleSheet("""
-            QWidget {
-                background-color: #2C3E50;
+        self.profilePictureButton.setStyleSheet(f"""
+            QWidget {{
+                background-color: {theme_color[0]};
                 border: none;
                 border-radius: 27px;
                 margin-bottom: 3px;
-                color: white;
+                color: {theme_color[4]};
                 font-size: 18px;
                 text-align: left;
                 padding-left: 15px;
-            }
-            QWidget:hover {
-                background-color: #364758;
-            }
+            }}
+            QWidget:hover {{
+                background-color: {theme_color[2]};
+            }}
         """)
 
         # Cambiar el cursor a un puntero de mano al pasar sobre el widget
@@ -155,57 +160,57 @@ class Configuration(QMainWindow):
         main_layout = QHBoxLayout(self.profileUsernameButton)
 
         # Crear QLabel para mostrar la imagen
-        change_profile_pic_icon = QPixmap("src/resources/images/change_username/white/tblanco.png")
-        change_profile_pic_icon = change_profile_pic_icon.scaled(30, 30, Qt.KeepAspectRatio)
-        image_label = QLabel()
-        image_label.setPixmap(change_profile_pic_icon)
+        self.change_profile_pic_icon_2 = QPixmap(f"src/resources/images/{theme_color[4]}/change_username/change_username.png")
+        self.change_profile_pic_icon_2 = self.change_profile_pic_icon_2.scaled(30, 30, Qt.KeepAspectRatio)
+        self.image_label_2 = QLabel()
+        self.image_label_2.setPixmap(self.change_profile_pic_icon_2)
 
-        image_label.setStyleSheet("""
-            QLabel {
-                color: white;  /* Cambiar color del texto */
+        self.image_label_2.setStyleSheet(f"""
+            QLabel {{
+                color: {theme_color[4]};  /* Cambiar color del texto */
                 background-color: transparent;  /* Evitar que tenga fondo */
                 padding-left: 10px;  /* Alinear texto con la imagen */
-            }
-            QLabel:hover {
+            }}
+            QLabel:hover {{
                 background-color: transparent;  /* El fondo sigue siendo transparente */
-            }
+            }}
         """)
 
         # Añadir la imagen al layout principal
-        main_layout.addWidget(image_label, alignment=Qt.AlignLeft)
+        main_layout.addWidget(self.image_label_2, alignment=Qt.AlignLeft)
 
         # Crear un layout para el texto
-        label = QLabel("Cambiar nombre de usuario")
+        self.label_2 = QLabel("Cambiar nombre de usuario")
         main_layout.setAlignment(Qt.AlignLeft)
 
-        label.setStyleSheet("""
-            QLabel {
-                color: white;  /* Cambiar color del texto */
+        self.label_2.setStyleSheet(f"""
+            QLabel {{
+                color: {theme_color[4]};  /* Cambiar color del texto */
                 background-color: transparent;  /* Evitar que tenga fondo */
                 padding-left: 10px;  /* Alinear texto con la imagen */
-            }
-            QLabel:hover {
+            }}
+            QLabel:hover {{
                 background-color: transparent;  /* El fondo sigue siendo transparente */
-            }
+            }}
         """)
 
-        main_layout.addWidget(label)
+        main_layout.addWidget(self.label_2)
 
         # Estilo del QWidget
-        self.profileUsernameButton.setStyleSheet("""
-            QWidget {
-                background-color: #2C3E50;
+        self.profileUsernameButton.setStyleSheet(f"""
+            QWidget {{
+                background-color: {theme_color[0]};
                 border: none;
                 border-radius: 27px;
                 margin-bottom: 3px;
-                color: white;
+                color: {theme_color[4]};
                 font-size: 18px;
                 text-align: left;
                 padding-left: 15px;
-            }
-            QWidget:hover {
-                background-color: #364758;
-            }
+            }}
+            QWidget:hover {{
+                background-color: {theme_color[2]};
+            }}
         """)
 
         # Cambiar el cursor a un puntero de mano al pasar sobre el widget
@@ -223,57 +228,57 @@ class Configuration(QMainWindow):
         main_layout = QHBoxLayout(self.profilePasswordButton)
 
         # Crear QLabel para mostrar la imagen
-        change_profile_pic_icon = QPixmap("src/resources/images/password/in_configuration/white/ocultarcontraseñablanco.png")
-        change_profile_pic_icon = change_profile_pic_icon.scaled(30, 30, Qt.KeepAspectRatio)
-        image_label = QLabel()
-        image_label.setPixmap(change_profile_pic_icon)
+        self.change_profile_pic_icon_3 = QPixmap(f"src/resources/images/{theme_color[4]}/password_in_configuration/hidepassword.png")
+        self.change_profile_pic_icon_3 = self.change_profile_pic_icon_3.scaled(30, 30, Qt.KeepAspectRatio)
+        self.image_label_3 = QLabel()
+        self.image_label_3.setPixmap(self.change_profile_pic_icon_3)
 
-        image_label.setStyleSheet("""
-            QLabel {
-                color: white;  /* Cambiar color del texto */
+        self.image_label_3.setStyleSheet(f"""
+            QLabel {{
+                color: {theme_color[4]};  /* Cambiar color del texto */
                 background-color: transparent;  /* Evitar que tenga fondo */
                 padding-left: 10px;  /* Alinear texto con la imagen */
-            }
-            QLabel:hover {
+            }}
+            QLabel:hover {{
                 background-color: transparent;  /* El fondo sigue siendo transparente */
-            }
+            }}
         """)
 
         # Añadir la imagen al layout principal
-        main_layout.addWidget(image_label, alignment=Qt.AlignLeft)
+        main_layout.addWidget(self.image_label_3, alignment=Qt.AlignLeft)
 
         # Crear un layout para el texto
-        label = QLabel("Cambiar contraseña")
+        self.label_3 = QLabel("Cambiar contraseña")
         main_layout.setAlignment(Qt.AlignLeft)
 
-        label.setStyleSheet("""
-            QLabel {
-                color: white;  /* Cambiar color del texto */
+        self.label_3.setStyleSheet(f"""
+            QLabel {{
+                color: {theme_color[4]};  /* Cambiar color del texto */
                 background-color: transparent;  /* Evitar que tenga fondo */
                 padding-left: 10px;  /* Alinear texto con la imagen */
-            }
-            QLabel:hover {
+            }}
+            QLabel:hover {{
                 background-color: transparent;  /* El fondo sigue siendo transparente */
-            }
+            }}
         """)
 
-        main_layout.addWidget(label)
+        main_layout.addWidget(self.label_3)
 
         # Estilo del QWidget
-        self.profilePasswordButton.setStyleSheet("""
-            QWidget {
-                background-color: #2C3E50;
+        self.profilePasswordButton.setStyleSheet(f"""
+            QWidget {{
+                background-color: {theme_color[0]};
                 border: none;
                 border-radius: 27px;
                 margin-bottom: 3px;
-                color: white;
+                color: {theme_color[4]};
                 font-size: 18px;
                 text-align: left;
                 padding-left: 15px;
-            }
-            QWidget:hover {
-                background-color: #364758;
-            }
+            }}
+            QWidget:hover {{
+                background-color: {theme_color[2]};
+            }}
         """)
 
         # Cambiar el cursor a un puntero de mano al pasar sobre el widget
@@ -291,57 +296,57 @@ class Configuration(QMainWindow):
         main_layout = QHBoxLayout(self.profileLanguageButton)
 
         # Crear QLabel para mostrar la imagen
-        change_profile_pic_icon = QPixmap("src/resources/images/language/white/idiomablanco.png")
-        change_profile_pic_icon = change_profile_pic_icon.scaled(35, 35, Qt.KeepAspectRatio)
-        image_label = QLabel()
-        image_label.setPixmap(change_profile_pic_icon)
+        self.change_profile_pic_icon_4 = QPixmap(f"src/resources/images/{theme_color[4]}/language/language.png")
+        self.change_profile_pic_icon_4 = self.change_profile_pic_icon_4.scaled(35, 35, Qt.KeepAspectRatio)
+        self.image_label_4 = QLabel()
+        self.image_label_4.setPixmap(self.change_profile_pic_icon_4)
 
-        image_label.setStyleSheet("""
-            QLabel {
-                color: white;  /* Cambiar color del texto */
+        self.image_label_4.setStyleSheet(f"""
+            QLabel {{
+                color: {theme_color[4]};  /* Cambiar color del texto */
                 background-color: transparent;  /* Evitar que tenga fondo */
                 padding-left: 10px;  /* Alinear texto con la imagen */
-            }
-            QLabel:hover {
+            }}
+            QLabel:hover {{
                 background-color: transparent;  /* El fondo sigue siendo transparente */
-            }
+            }}
         """)
 
         # Añadir la imagen al layout principal
-        main_layout.addWidget(image_label, alignment=Qt.AlignLeft)
+        main_layout.addWidget(self.image_label_4, alignment=Qt.AlignLeft)
 
         # Crear un layout para el texto
-        label = QLabel("Idioma")
+        self.label_4 = QLabel("Idioma")
         main_layout.setAlignment(Qt.AlignLeft)
 
-        label.setStyleSheet("""
-            QLabel {
-                color: white;  /* Cambiar color del texto */
+        self.label_4.setStyleSheet(f"""
+            QLabel {{
+                color: {theme_color[4]};  /* Cambiar color del texto */
                 background-color: transparent;  /* Evitar que tenga fondo */
                 padding-left: 10px;  /* Alinear texto con la imagen */
-            }
-            QLabel:hover {
+            }}
+            QLabel:hover {{
                 background-color: transparent;  /* El fondo sigue siendo transparente */
-            }
+            }}
         """)
 
-        main_layout.addWidget(label)
+        main_layout.addWidget(self.label_4)
 
         # Estilo del QWidget
-        self.profileLanguageButton.setStyleSheet("""
-            QWidget {
-                background-color: #2C3E50;
+        self.profileLanguageButton.setStyleSheet(f"""
+            QWidget {{
+                background-color: {theme_color[0]};
                 border: none;
                 border-radius: 27px;
                 margin-bottom: 3px;
-                color: white;
+                color: {theme_color[4]};
                 font-size: 18px;
                 text-align: left;
                 padding-left: 15px;
-            }
-            QWidget:hover {
-                background-color: #364758;
-            }
+            }}
+            QWidget:hover {{
+                background-color: {theme_color[2]};
+            }}
         """)
 
         # Cambiar el cursor a un puntero de mano al pasar sobre el widget
@@ -359,73 +364,73 @@ class Configuration(QMainWindow):
         main_layout = QHBoxLayout()
 
         # Crear QLabel para mostrar la imagen
-        change_profile_pic_icon = QPixmap("src/resources/images/theme/white/temablanco.png")
-        change_profile_pic_icon = change_profile_pic_icon.scaled(35, 35, Qt.KeepAspectRatio)
-        image_label = QLabel()
-        image_label.setPixmap(change_profile_pic_icon)
+        self.change_profile_pic_icon_5 = QPixmap(f"src/resources/images/{theme_color[4]}/theme/theme.png")
+        self.change_profile_pic_icon_5 = self.change_profile_pic_icon_5.scaled(35, 35, Qt.KeepAspectRatio)
+        self.image_label_5 = QLabel()
+        self.image_label_5.setPixmap(self.change_profile_pic_icon_5)
 
-        image_label.setStyleSheet("""
-            QLabel {
-                color: white;  /* Cambiar color del texto */
+        self.image_label_5.setStyleSheet(f"""
+            QLabel {{
+                color: {theme_color[4]};  /* Cambiar color del texto */
                 background-color: transparent;  /* Evitar que tenga fondo */
                 padding-left: 10px;  /* Alinear texto con la imagen */
-            }
+            }}
         """)
 
         # Añadir la imagen al layout principal
-        main_layout.addWidget(image_label, alignment=Qt.AlignLeft)
+        main_layout.addWidget(self.image_label_5, alignment=Qt.AlignLeft)
 
         # Crear un layout para el texto
-        label = QLabel("Temas")
+        self.label_5 = QLabel("Temas")
         main_layout.setAlignment(Qt.AlignLeft)
 
-        label.setStyleSheet("""
-            QLabel {
-                color: white;  /* Cambiar color del texto */
+        self.label_5.setStyleSheet(f"""
+            QLabel {{
+                color: {theme_color[4]};  /* Cambiar color del texto */
                 background-color: transparent;  /* Evitar que tenga fondo */
                 padding-left: 10px;  /* Alinear texto con la imagen */
-            }
+            }}
         """)
 
-        main_layout.addWidget(label)
+        main_layout.addWidget(self.label_5)
 
         main_layout_2 = QHBoxLayout()
 
-        combobox_theme = QComboBox()
-        combobox_theme.addItems(["Default", "Light", "Dark", "Pink", "Special"])  # Agregar elementos
+        self.combobox_theme_5 = QComboBox()
+        self.combobox_theme_5.addItems(["Default", "Light", "Dark", "Pink", "Special"])  # Agregar elementos
         main_layout_2.setAlignment(Qt.AlignRight)
-        combobox_theme.setStyleSheet("""
-            QComboBox {
-                color: white;  /* Cambiar color del texto */
-                background-color: #2C3E50;  /* Evitar que tenga fondo */
+        self.combobox_theme_5.setStyleSheet(f"""
+            QComboBox {{
+                color: {theme_color[4]};  /* Cambiar color del texto */
+                background-color: {theme_color[0]};  /* Evitar que tenga fondo */
                 border-radius: 5px;  /* Bordes redondeados */
                 padding: 5px;  /* Espaciado interno */
-            }
-            QComboBox:hover {
+            }}
+            QComboBox:hover {{
                 background-color: rgba(255, 255, 255, 0.1);  /* El fondo sigue siendo transparente */
-            }
-            QComboBox::drop-down {
-            }
-            QComboBox::down-arrow {
-            }
-            QComboBox QAbstractItemView {
-                background-color: #34495E;  /* Color de fondo del menú desplegable */
-                color: white;  /* Color del texto en el menú */
-                selection-background-color: #2C3E50;
-                selection-color: white;  /* Color del texto del elemento seleccionado */
+            }}
+            QComboBox::drop-down {{
+            }}
+            QComboBox::down-arrow {{
+            }}
+            QComboBox QAbstractItemView {{
+                background-color: {theme_color[2]};  /* Color de fondo del menú desplegable */
+                color: {theme_color[4]};  /* Color del texto en el menú */
+                selection-background-color: {theme_color[0]};
+                selection-color: {theme_color[4]};  /* Color del texto del elemento seleccionado */
                 border-radius: 5px;  /* Bordes redondeados */
                 outline: none;  /* Evitar el contorno */
                 padding: 5px;
                 spacing: 10px;  /* Espaciado entre las opciones */
-            }
-            QComboBox QAbstractItemView::item {
+            }}
+            QComboBox QAbstractItemView::item {{
                 padding-left: 15px;  /* Espaciado interno izquierdo */
                 padding-right: 15px;  /* Espaciado interno derecho */
                 padding-top: 10px;  /* Espaciado interno superior */
                 padding-bottom: 10px;  /* Espaciado interno inferior */
-            }
+            }}
         """)
-        combobox_theme.setCursor(QCursor(Qt.PointingHandCursor))
+        self.combobox_theme_5.setCursor(QCursor(Qt.PointingHandCursor))
 
         self.themes = {
             0: "default",   # Opción 1
@@ -435,22 +440,22 @@ class Configuration(QMainWindow):
             4: "special"
         }
 
-        combobox_theme.currentIndexChanged.connect(self.selection_changed)
+        self.combobox_theme_5.currentIndexChanged.connect(self.selection_changed)
 
-        main_layout_2.addWidget(combobox_theme)
+        main_layout_2.addWidget(self.combobox_theme_5)
 
         # Estilo del QWidget
-        self.profileThemeButton.setStyleSheet("""
-            QWidget {
-                background-color: #2C3E50;
+        self.profileThemeButton.setStyleSheet(f"""
+            QWidget {{
+                background-color: {theme_color[0]};
                 border: none;
                 border-radius: 27px;
                 margin-bottom: 3px;
-                color: white;
+                color: {theme_color[4]};
                 font-size: 18px;
                 text-align: left;
                 padding-left: 15px;
-            }
+            }}
         """)
         # Cambiar el cursor a un puntero de mano al pasar sobre el widget
         main_layout_final.addLayout(main_layout)
@@ -467,24 +472,24 @@ class Configuration(QMainWindow):
         main_layout = QHBoxLayout(self.profileSignOutButton)
 
         # Crear QLabel para mostrar la imagen
-        change_profile_pic_icon = QPixmap("src/resources/images/signout/red/redsignout.png")
-        change_profile_pic_icon = change_profile_pic_icon.scaled(35, 35, Qt.KeepAspectRatio)
-        image_label = QLabel()
-        image_label.setPixmap(change_profile_pic_icon)
+        self.change_profile_pic_icon_6 = QPixmap("src/resources/images/red/signout/signout.png")
+        self.change_profile_pic_icon_6 = self.change_profile_pic_icon_6.scaled(35, 35, Qt.KeepAspectRatio)
+        self.image_label_6 = QLabel()
+        self.image_label_6.setPixmap(self.change_profile_pic_icon_6)
 
-        image_label.setStyleSheet("""
-            QLabel {
-                color: white;  /* Cambiar color del texto */
+        self.image_label_6.setStyleSheet(f"""
+            QLabel {{
+                color: red;  /* Cambiar color del texto */
                 background-color: transparent;  /* Evitar que tenga fondo */
                 padding-left: 10px;  /* Alinear texto con la imagen */
-            }
-            QLabel:hover {
+            }}
+            QLabel:hover {{
                 background-color: transparent;  /* El fondo sigue siendo transparente */
-            }
+            }}
         """)
 
         # Añadir la imagen al layout principal
-        main_layout.addWidget(image_label, alignment=Qt.AlignLeft)
+        main_layout.addWidget(self.image_label_6, alignment=Qt.AlignLeft)
 
         # Crear un layout para el texto
         label = QLabel("Sign out")
@@ -504,20 +509,20 @@ class Configuration(QMainWindow):
         main_layout.addWidget(label)
 
         # Estilo del QWidget
-        self.profileSignOutButton.setStyleSheet("""
-            QWidget {
-                background-color: #2C3E50;
+        self.profileSignOutButton.setStyleSheet(f"""
+            QWidget {{
+                background-color: {theme_color[0]};
                 border: none;
                 border-radius: 27px;
                 margin-bottom: 3px;
-                color: white;
+                color: {theme_color[4]};
                 font-size: 18px;
                 text-align: left;
                 padding-left: 15px;
-            }
-            QWidget:hover {
-                background-color: #364758;
-            }
+            }}
+            QWidget:hover {{
+                background-color: {theme_color[2]};
+            }}
         """)
 
         # Cambiar el cursor a un puntero de mano al pasar sobre el widget
@@ -562,3 +567,246 @@ class Configuration(QMainWindow):
         theme_option = self.themes.get(index, "Desconocido")
         update_theme_controller(theme_option)
         self.theme_changed.emit()
+        self.update_theme_configuration()
+    
+    def update_theme_configuration(self):
+        theme = get_theme_controller()
+        theme_color = change_theme(self, theme)
+        self.central_widget.setStyleSheet(f"background-color: {theme_color[1]};")
+        back_button = QPixmap(f"src/resources/images/{theme_color[4]}/back/back.png")
+        self.back_button.setIcon(QIcon(back_button))
+        self.back_button.setIconSize(QSize(45, 45))
+        self.back_content_layout.addWidget(self.back_button, alignment=Qt.AlignLeft)
+
+        self.change_profile_pic_icon_1 = QPixmap(f"src/resources/images/{theme_color[4]}/profile/profile.png")
+        self.change_profile_pic_icon_1 = self.change_profile_pic_icon_1.scaled(34, 34, Qt.KeepAspectRatio)
+        self.image_label_1.setPixmap(self.change_profile_pic_icon_1)
+        self.image_label_1.setStyleSheet(f"""
+            QLabel {{
+                color: {theme_color[4]};  /* Cambiar color del texto */
+                background-color: transparent;  /* Evitar que tenga fondo */
+                padding-left: 10px;  /* Alinear texto con la imagen */
+            }}
+            QLabel:hover {{
+                background-color: transparent;  /* El fondo sigue siendo transparente */
+            }}
+        """)
+        self.label_1.setStyleSheet(f"""
+            QLabel {{
+                color: {theme_color[4]};  /* Cambiar color del texto */
+                background-color: transparent;  /* Evitar que tenga fondo */
+                padding-left: 10px;  /* Alinear texto con la imagen */
+            }}
+            QLabel:hover {{
+                background-color: transparent;  /* El fondo sigue siendo transparente */
+            }}
+        """)
+        self.profilePictureButton.setStyleSheet(f"""
+            QWidget {{
+                background-color: {theme_color[0]};
+                border: none;
+                border-radius: 27px;
+                margin-bottom: 3px;
+                color: {theme_color[4]};
+                font-size: 18px;
+                text-align: left;
+                padding-left: 15px;
+            }}
+            QWidget:hover {{
+                background-color: {theme_color[2]};
+            }}
+        """)
+
+        self.change_profile_pic_icon_2 = QPixmap(f"src/resources/images/{theme_color[4]}/change_username/change_username.png")
+        self.change_profile_pic_icon_2 = self.change_profile_pic_icon_2.scaled(34, 34, Qt.KeepAspectRatio)
+        self.image_label_2.setPixmap(self.change_profile_pic_icon_2)
+        self.image_label_2.setStyleSheet(f"""
+            QLabel {{
+                color: {theme_color[4]};  /* Cambiar color del texto */
+                background-color: transparent;  /* Evitar que tenga fondo */
+                padding-left: 10px;  /* Alinear texto con la imagen */
+            }}
+            QLabel:hover {{
+                background-color: transparent;  /* El fondo sigue siendo transparente */
+            }}
+        """)
+        self.label_2.setStyleSheet(f"""
+            QLabel {{
+                color: {theme_color[4]};  /* Cambiar color del texto */
+                background-color: transparent;  /* Evitar que tenga fondo */
+                padding-left: 10px;  /* Alinear texto con la imagen */
+            }}
+            QLabel:hover {{
+                background-color: transparent;  /* El fondo sigue siendo transparente */
+            }}
+        """)
+        self.profileUsernameButton.setStyleSheet(f"""
+            QWidget {{
+                background-color: {theme_color[0]};
+                border: none;
+                border-radius: 27px;
+                margin-bottom: 3px;
+                color: {theme_color[4]};
+                font-size: 18px;
+                text-align: left;
+                padding-left: 15px;
+            }}
+            QWidget:hover {{
+                background-color: {theme_color[2]};
+            }}
+        """)
+
+        self.change_profile_pic_icon_3 = QPixmap(f"src/resources/images/{theme_color[4]}/password_in_configuration/hidepassword.png")
+        self.change_profile_pic_icon_3 = self.change_profile_pic_icon_3.scaled(34, 34, Qt.KeepAspectRatio)
+        self.image_label_3.setPixmap(self.change_profile_pic_icon_3)
+        self.image_label_3.setStyleSheet(f"""
+            QLabel {{
+                color: {theme_color[4]};  /* Cambiar color del texto */
+                background-color: transparent;  /* Evitar que tenga fondo */
+                padding-left: 10px;  /* Alinear texto con la imagen */
+            }}
+            QLabel:hover {{
+                background-color: transparent;  /* El fondo sigue siendo transparente */
+            }}
+        """)
+        self.label_3.setStyleSheet(f"""
+            QLabel {{
+                color: {theme_color[4]};  /* Cambiar color del texto */
+                background-color: transparent;  /* Evitar que tenga fondo */
+                padding-left: 10px;  /* Alinear texto con la imagen */
+            }}
+            QLabel:hover {{
+                background-color: transparent;  /* El fondo sigue siendo transparente */
+            }}
+        """)
+        self.profilePasswordButton.setStyleSheet(f"""
+            QWidget {{
+                background-color: {theme_color[0]};
+                border: none;
+                border-radius: 27px;
+                margin-bottom: 3px;
+                color: {theme_color[4]};
+                font-size: 18px;
+                text-align: left;
+                padding-left: 15px;
+            }}
+            QWidget:hover {{
+                background-color: {theme_color[2]};
+            }}
+        """)
+
+        self.change_profile_pic_icon_4 = QPixmap(f"src/resources/images/{theme_color[4]}/language/language.png")
+        self.change_profile_pic_icon_4 = self.change_profile_pic_icon_4.scaled(34, 34, Qt.KeepAspectRatio)
+        self.image_label_4.setPixmap(self.change_profile_pic_icon_4)
+        self.image_label_4.setStyleSheet(f"""
+            QLabel {{
+                color: {theme_color[4]};  /* Cambiar color del texto */
+                background-color: transparent;  /* Evitar que tenga fondo */
+                padding-left: 10px;  /* Alinear texto con la imagen */
+            }}
+            QLabel:hover {{
+                background-color: transparent;  /* El fondo sigue siendo transparente */
+            }}
+        """)
+        self.label_4.setStyleSheet(f"""
+            QLabel {{
+                color: {theme_color[4]};  /* Cambiar color del texto */
+                background-color: transparent;  /* Evitar que tenga fondo */
+                padding-left: 10px;  /* Alinear texto con la imagen */
+            }}
+            QLabel:hover {{
+                background-color: transparent;  /* El fondo sigue siendo transparente */
+            }}
+        """)
+        self.profileLanguageButton.setStyleSheet(f"""
+            QWidget {{
+                background-color: {theme_color[0]};
+                border: none;
+                border-radius: 27px;
+                margin-bottom: 3px;
+                color: {theme_color[4]};
+                font-size: 18px;
+                text-align: left;
+                padding-left: 15px;
+            }}
+            QWidget:hover {{
+                background-color: {theme_color[2]};
+            }}
+        """)
+
+        self.change_profile_pic_icon_5 = QPixmap(f"src/resources/images/{theme_color[4]}/theme/theme.png")
+        self.change_profile_pic_icon_5 = self.change_profile_pic_icon_5.scaled(34, 34, Qt.KeepAspectRatio)
+        self.image_label_5.setPixmap(self.change_profile_pic_icon_5)
+        self.image_label_5.setStyleSheet(f"""
+            QLabel {{
+                color: {theme_color[4]};  /* Cambiar color del texto */
+                background-color: transparent;  /* Evitar que tenga fondo */
+                padding-left: 10px;  /* Alinear texto con la imagen */
+            }}
+        """)
+        self.label_5.setStyleSheet(f"""
+            QLabel {{
+                color: {theme_color[4]};  /* Cambiar color del texto */
+                background-color: transparent;  /* Evitar que tenga fondo */
+                padding-left: 10px;  /* Alinear texto con la imagen */
+            }}
+        """)
+        self.combobox_theme_5.setStyleSheet(f"""
+            QComboBox {{
+                color: {theme_color[4]};  /* Cambiar color del texto */
+                background-color: {theme_color[0]};  /* Evitar que tenga fondo */
+                border-radius: 5px;  /* Bordes redondeados */
+                padding: 5px;  /* Espaciado interno */
+            }}
+            QComboBox:hover {{
+                background-color: rgba(255, 255, 255, 0.1);  /* El fondo sigue siendo transparente */
+            }}
+            QComboBox::drop-down {{
+            }}
+            QComboBox::down-arrow {{
+            }}
+            QComboBox QAbstractItemView {{
+                background-color: {theme_color[2]};  /* Color de fondo del menú desplegable */
+                color: {theme_color[4]};  /* Color del texto en el menú */
+                selection-background-color: {theme_color[0]};
+                selection-color: {theme_color[4]};  /* Color del texto del elemento seleccionado */
+                border-radius: 5px;  /* Bordes redondeados */
+                outline: none;  /* Evitar el contorno */
+                padding: 5px;
+                spacing: 10px;  /* Espaciado entre las opciones */
+            }}
+            QComboBox QAbstractItemView::item {{
+                padding-left: 15px;  /* Espaciado interno izquierdo */
+                padding-right: 15px;  /* Espaciado interno derecho */
+                padding-top: 10px;  /* Espaciado interno superior */
+                padding-bottom: 10px;  /* Espaciado interno inferior */
+            }}
+        """)
+        self.profileThemeButton.setStyleSheet(f"""
+            QWidget {{
+                background-color: {theme_color[0]};
+                border: none;
+                border-radius: 27px;
+                margin-bottom: 3px;
+                color: {theme_color[4]};
+                font-size: 18px;
+                text-align: left;
+                padding-left: 15px;
+            }}
+        """)
+
+        self.profileSignOutButton.setStyleSheet(f"""
+            QWidget {{
+                background-color: {theme_color[0]};
+                border: none;
+                border-radius: 27px;
+                margin-bottom: 3px;
+                color: {theme_color[4]};
+                font-size: 18px;
+                text-align: left;
+                padding-left: 15px;
+            }}
+            QWidget:hover {{
+                background-color: {theme_color[2]};
+            }}
+        """)

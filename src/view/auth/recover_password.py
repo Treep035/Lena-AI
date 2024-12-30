@@ -54,7 +54,7 @@ def recover_password(parent):
     email_input.setStyleSheet("border-radius: 10px; border: 1px solid #ccc; padding-left: 10px; color: white; background-color: #233240; margin-right: 25px;")
 
     send_button = QPushButton()
-    send_icon = QPixmap("src/resources/images/sendmessage/sendwhite.png")  # Asegúrate de que esta ruta sea correcta
+    send_icon = QPixmap("src/resources/images/white/sendmessage/sendmessage.png")  # Asegúrate de que esta ruta sea correcta
     send_button.setIcon(QIcon(send_icon))  # Establece la imagen como ícono
     send_button.setIconSize(QSize(18, 18))
 

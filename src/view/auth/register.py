@@ -68,14 +68,14 @@ class Register(QMainWindow):
         self.text_password.setFixedSize(300, 50)
 
         self.toggle_button = QPushButton()
-        self.toggle_button.setIcon(QIcon("src/resources/images/password/white/showpasswordwhite.png"))  # Cambia "path/to/eye_icon.png" a la ruta de tu icono de ojo self
+        self.toggle_button.setIcon(QIcon("src/resources/images/white/password/showpassword.png"))  # Cambia "path/to/eye_icon.png" a la ruta de tu icono de ojo self
         self.toggle_button.setCheckable(True)
         self.toggle_button.setStyleSheet("background: transparent; border: none; padding-right: 10px;")
         self.toggle_button.setCursor(Qt.PointingHandCursor)
         self.toggle_button.clicked.connect(self.toggle_password_visibility)
         
         self.date_birthdate = QDateEdit()
-        image_path = os.path.abspath("./src/resources/images/calendar/black/calendarblack.png")
+        image_path = os.path.abspath("./src/resources/images/white/calendar/calendar.png")
         if not os.path.exists(image_path):
             print(f"¡La imagen no se encuentra en la ruta: {image_path}!")
         self.date_birthdate.setStyleSheet("""
@@ -178,7 +178,7 @@ class Register(QMainWindow):
     def toggle_password_visibility(self):
         if self.toggle_button.isChecked():
             self.text_password.setEchoMode(QLineEdit.Normal)
-            self.toggle_button.setIcon(QIcon("src/resources/images/password/white/hidepasswordwhite.png"))
+            self.toggle_button.setIcon(QIcon("src/resources/images/white/password/hidepassword.png"))
         else:
             self.text_password.setEchoMode(QLineEdit.Password)
-            self.toggle_button.setIcon(QIcon("src/resources/images/password/white/showpasswordwhite.png"))
+            self.toggle_button.setIcon(QIcon("src/resources/images/white/password/showpassword.png"))

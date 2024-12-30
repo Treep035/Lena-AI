@@ -70,7 +70,7 @@ class Login(QMainWindow):
         self.text_password.textChanged.connect(self.remove_error_message)
 
         self.toggle_button = QPushButton()
-        self.toggle_button.setIcon(QIcon("src/resources/images/password/white/showpasswordwhite.png"))  # Cambia "path/to/eye_icon.png" a la ruta de tu icono de ojo self
+        self.toggle_button.setIcon(QIcon("src/resources/images/white/password/showpassword.png"))  # Cambia "path/to/eye_icon.png" a la ruta de tu icono de ojo self
         self.toggle_button.setCheckable(True)
         self.toggle_button.setStyleSheet("background: transparent; border: none; padding-right: 10px;")
         self.toggle_button.setCursor(Qt.PointingHandCursor)
@@ -127,10 +127,10 @@ class Login(QMainWindow):
     def toggle_password_visibility(self):
         if self.toggle_button.isChecked():
             self.text_password.setEchoMode(QLineEdit.Normal)
-            self.toggle_button.setIcon(QIcon("src/resources/images/password/white/hidepasswordwhite.png"))
+            self.toggle_button.setIcon(QIcon("src/resources/images/white/password/hidepassword.png"))
         else:
             self.text_password.setEchoMode(QLineEdit.Password)
-            self.toggle_button.setIcon(QIcon("src/resources/images/password/white/showpasswordwhite.png"))
+            self.toggle_button.setIcon(QIcon("src/resources/images/white/password/showpassword.png"))
 
     def on_login_button_click(self):
         no_fields, invalid_fields, logged_in, id_user = validate_fields_login_controller(self)
