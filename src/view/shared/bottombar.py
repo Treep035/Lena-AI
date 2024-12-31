@@ -22,7 +22,7 @@ class BottomBar(QWidget):
         super().__init__()
 
         theme = get_theme_controller()
-        theme_color = change_theme(self, theme)
+        self.theme_color = change_theme(self, theme)
 
         self.setFixedHeight(75)
 
@@ -34,7 +34,7 @@ class BottomBar(QWidget):
         # Espaciador inicial (con color de fondo) para el margen izquierdo
         self.left_margin_spacer = QWidget()
         self.left_margin_spacer.setFixedWidth(40)  # Ancho del margen izquierdo
-        self.left_margin_spacer.setStyleSheet(f"background-color: {theme_color[0]};")  # Color de fondo del espaciador
+        self.left_margin_spacer.setStyleSheet(f"background-color: {self.theme_color[0]};")  # Color de fondo del espaciador
         hbox.addWidget(self.left_margin_spacer)
 
         # Imagen 1: Home (izquierda)
@@ -46,7 +46,7 @@ class BottomBar(QWidget):
         # Espaciador izquierdo (entre Home y Chat)
         self.left_spacer = QWidget()
         self.left_spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
-        self.left_spacer.setStyleSheet(f"background-color: {theme_color[0]};")  # Color de fondo del espaciador
+        self.left_spacer.setStyleSheet(f"background-color: {self.theme_color[0]};")  # Color de fondo del espaciador
         hbox.addWidget(self.left_spacer)
 
         # Imagen 2: Chat (centro)
@@ -58,7 +58,7 @@ class BottomBar(QWidget):
         # Espaciador derecho (entre Chat y Account)
         self.right_spacer = QWidget()
         self.right_spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
-        self.right_spacer.setStyleSheet(f"background-color: {theme_color[0]};")  # Color de fondo del espaciador
+        self.right_spacer.setStyleSheet(f"background-color: {self.theme_color[0]};")  # Color de fondo del espaciador
         hbox.addWidget(self.right_spacer)
 
         # Imagen 3: Account (derecha)
@@ -70,13 +70,13 @@ class BottomBar(QWidget):
         # Espaciador final (con color de fondo) para el margen derecho
         self.right_margin_spacer = QWidget()
         self.right_margin_spacer.setFixedWidth(40)  # Ancho del margen derecho
-        self.right_margin_spacer.setStyleSheet(f"background-color: {theme_color[0]};")  # Color de fondo del espaciador
+        self.right_margin_spacer.setStyleSheet(f"background-color: {self.theme_color[0]};")  # Color de fondo del espaciador
         hbox.addWidget(self.right_margin_spacer)
 
         # Estilo de la barra
         self.setStyleSheet(f"""
         QWidget {{
-            background-color: {theme_color[0]};
+            background-color: {self.theme_color[0]};
         }}
         QLabel {{
             padding-left: 10px;
@@ -88,14 +88,14 @@ class BottomBar(QWidget):
 
     def update_theme_bottombar(self):
         theme = get_theme_controller()
-        theme_color = change_theme(self, theme)
-        self.left_margin_spacer.setStyleSheet(f"background-color: {theme_color[0]};")
-        self.left_spacer.setStyleSheet(f"background-color: {theme_color[0]};")
-        self.right_spacer.setStyleSheet(f"background-color: {theme_color[0]};")
-        self.right_margin_spacer.setStyleSheet(f"background-color: {theme_color[0]};")
+        self.theme_color = change_theme(self, theme)
+        self.left_margin_spacer.setStyleSheet(f"background-color: {self.theme_color[0]};")
+        self.left_spacer.setStyleSheet(f"background-color: {self.theme_color[0]};")
+        self.right_spacer.setStyleSheet(f"background-color: {self.theme_color[0]};")
+        self.right_margin_spacer.setStyleSheet(f"background-color: {self.theme_color[0]};")
         self.setStyleSheet(f"""
         QWidget {{
-            background-color: {theme_color[0]};
+            background-color: {self.theme_color[0]};
         }}
         QLabel {{
             padding-left: 10px;
@@ -107,9 +107,7 @@ class BottomBar(QWidget):
 
     def setup_icon(self, label, icon_name, active):
         """Configura un QLabel como un icono clickeable, con estado activo/inactivo."""
-        theme = get_theme_controller()
-        theme_color = change_theme(self, theme)
-        image_path = f"src/resources/images/{theme_color[4]}/bottombar/{icon_name}{'_inactive' if not active else ''}.png"
+        image_path = f"src/resources/images/{self.theme_color[4]}/bottombar/{icon_name}{'_inactive' if not active else ''}.png"
         pixmap = QPixmap(image_path).scaled(40, 40, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         label.setPixmap(pixmap)
         label.setCursor(QCursor(Qt.PointingHandCursor))
