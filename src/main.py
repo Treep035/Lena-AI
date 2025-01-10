@@ -6,6 +6,7 @@ from PyQt5.QtGui import QIcon
 from controller.auth_token_controller import check_auth_token_controller
 
 from view.shared.titlebar import TitleBar
+from view.shared.titlebar_dialog import TitleBarDialog
 from view.auth.login import Login
 from view.auth.register import Register
 
@@ -73,10 +74,12 @@ class MainWindow(QMainWindow):
         self.chat_widget = Chat()
         self.account_widget = Account()
         self.configuration_widget = Configuration.get_instance()
+        self.title_bar_dialog = TitleBarDialog()
 
         self.bottom_bar = BottomBar()
 
         self.title_bar.update_theme_titlebar()
+        self.configuration_widget.update_theme_configuration()
         
         self.layout.addWidget(self.home_widget)
         

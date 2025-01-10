@@ -24,12 +24,18 @@ from PyQt5.QtCore import Qt, QEvent, QDate, QSize, QTimer
 
 from view.shared.titlebar_dialog import TitleBarDialog
 from controller.recover_password_controller import send_recovery_email_controller
+from controller.theme_controller import get_theme_controller
+from resources.styles.theme import change_theme
 
 def change_name(event, parent):
+
+    theme = get_theme_controller()
+    theme_color = change_theme(parent, theme)
+
     dialog = QDialog(parent)
     dialog.setFixedSize(350, 350)
     dialog.setWindowFlags(Qt.FramelessWindowHint | Qt.Popup)
-    dialog.setStyleSheet("background-color: #3F556B;")
+    dialog.setStyleSheet(f"background-color: {theme_color[2]};")
 
     layout = QVBoxLayout(dialog)
     layout.setContentsMargins(0, 0, 0, 0)
@@ -42,7 +48,7 @@ def change_name(event, parent):
 
     label = QLabel("Cambiar nombre de usuario")
     label.setAlignment(Qt.AlignCenter)
-    label.setStyleSheet("color: white; font-size: 20px; font-weight: 488; padding-bottom: 5px;")
+    label.setStyleSheet(f"color: {theme_color[4]}; font-size: 20px; font-weight: 488; padding-bottom: 5px;")
 
     # Crea el layout para el campo de correo y el botón
     input_layout = QVBoxLayout()
@@ -50,23 +56,23 @@ def change_name(event, parent):
 
     actual_name_input = QLineEdit()
     actual_name_input.setPlaceholderText("Nombre actual...")
-    actual_name_input.setFixedSize(325, 50)
-    actual_name_input.setStyleSheet("border-radius: 10px; border: 1px solid #ccc; padding-left: 10px; color: white; background-color: #233240; margin-right: 25px;")
+    actual_name_input.setFixedSize(345, 50)
+    actual_name_input.setStyleSheet(f"border-radius: 10px; border: 1px solid #ccc; padding-left: 10px; color: {theme_color[4]}; background-color: {theme_color[1]}; margin-right: 25px;")
 
     modified_name_input = QLineEdit()
     modified_name_input.setPlaceholderText("Nuevo nombre...")
-    modified_name_input.setFixedSize(325, 50)
-    modified_name_input.setStyleSheet("border-radius: 10px; border: 1px solid #ccc; padding-left: 10px; color: white; background-color: #233240; margin-right: 25px;")
+    modified_name_input.setFixedSize(345, 50)
+    modified_name_input.setStyleSheet(f"border-radius: 10px; border: 1px solid #ccc; padding-left: 10px; color: {theme_color[4]}; background-color: {theme_color[1]}; margin-right: 25px;")
 
     confirm_modified_name_input = QLineEdit()
     confirm_modified_name_input.setPlaceholderText("Confirmar nuevo nombre...")
-    confirm_modified_name_input.setFixedSize(325, 50)
-    confirm_modified_name_input.setStyleSheet("border-radius: 10px; border: 1px solid #ccc; padding-left: 10px; color: white; background-color: #233240; margin-right: 25px;")
+    confirm_modified_name_input.setFixedSize(345, 50)
+    confirm_modified_name_input.setStyleSheet(f"border-radius: 10px; border: 1px solid #ccc; padding-left: 10px; color: {theme_color[4]}; background-color: {theme_color[1]}; margin-right: 25px;")
 
     save_changes = QPushButton("Guardar cambios")
-    save_changes.setStyleSheet(""" 
-        background-color: #2C3E50; 
-        color: white; 
+    save_changes.setStyleSheet(f""" 
+        background-color: {theme_color[0]}; 
+        color: {theme_color[4]}; 
         padding: 10px; 
         border: 1px solid #ccc;
         border-radius: 10px; 
@@ -86,7 +92,7 @@ def change_name(event, parent):
 
     status_label = QLabel()
     status_label.setAlignment(Qt.AlignLeft)
-    status_label.setStyleSheet("color: white; font-size: 10px;")
+    status_label.setStyleSheet(f"color: {theme_color[4]}; font-size: 10px;")
     main_content_layout.addWidget(status_label)
 
     # Ahora, asigna main_content_layout al layout principal del diálogo

@@ -101,7 +101,7 @@ class TitleBar(QWidget):
                 source.setStyleSheet(f"background-color: {theme_color[0]}; color: {theme_color[4]}; border: none; font-size: 16px; padding-bottom: 5px;")
             elif event.type() == QEvent.MouseButtonPress:
                 if event.button() == Qt.LeftButton:
-                    source.setStyleSheet(f"background-color: rgba(0, 0, 0, 0.9); color: {theme_color[4]}; border: none; font-size: 16px; padding-bottom: 5px;")
+                    source.setStyleSheet(f"background-color: {theme_color[3]}; color: {theme_color[4]}; border: none; font-size: 16px; padding-bottom: 5px;")
             elif event.type() == QEvent.MouseButtonRelease:
                 if event.button() == Qt.LeftButton:
                     source.setStyleSheet(f"background-color: {theme_color[0]}; color: {theme_color[4]}; border: none; font-size: 16px; padding-bottom: 5px;")
@@ -171,3 +171,27 @@ class TitleBar(QWidget):
                 padding-left: 10px;
             }}
         """)
+
+        def update_button_styles(source, event):
+            if source in (self.minimize_button, self.close_button):
+                if event.type() == QEvent.Enter:
+                    source.setStyleSheet(f"background-color: {theme_color[2]}; color: {theme_color[4]}; border: none; font-size: 16px; padding-bottom: 5px;")
+                elif event.type() == QEvent.Leave:
+                    source.setStyleSheet(f"background-color: {theme_color[0]}; color: {theme_color[4]}; border: none; font-size: 16px; padding-bottom: 5px;")
+                elif event.type() == QEvent.MouseButtonPress:
+                    if event.button() == Qt.LeftButton:
+                        source.setStyleSheet(f"background-color: {theme_color[3]}; color: {theme_color[4]}; border: none; font-size: 16px; padding-bottom: 5px;")
+                elif event.type() == QEvent.MouseButtonRelease:
+                    if event.button() == Qt.LeftButton:
+                        source.setStyleSheet(f"background-color: {theme_color[0]}; color: {theme_color[4]}; border: none; font-size: 16px; padding-bottom: 5px;")
+                        if source == self.minimize_button:
+                            self.minimize()  # Minimizar la ventana si se libera el botón de minimizar
+                        elif source == self.close_button:
+                            self.window().close()  # Cerrar la ventana correctamente
+    
+        def eventFilter(self, source, event):
+                update_button_styles(source, event)
+                return super().eventFilter(source, event)
+            
+            # Vuelve a asignar el método a la clase
+        self.eventFilter = eventFilter.__get__(self, TitleBar)

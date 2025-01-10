@@ -1,3 +1,5 @@
+import threading
+import time
 import speech_recognition as sr
 from gtts import gTTS
 from playsound import playsound
@@ -52,16 +54,17 @@ def generate_response(prompt):
         search_query = prompt.lower().replace("busca ", "")
         search_url = f"https://www.google.com/search?q={search_query}"
         webbrowser.open(search_url)
-        response = f"Buscando resultados para: {search_query}"
+        response = f"Buscando {search_query} en Google."
     else:
         response = "Lo siento, no entendí eso. ¿Puedes intentar de nuevo?"
     return response
 
-def start():
+def start(self):
+    self._stop_event = threading.Event()
     # Hablar al inicio
     speak("Hola, estoy lista para atenderte. Pregúntame lo que necesites.")
     
-    while True:
+    while not self._stop_event.is_set():
         try:
             user_input = transcribe_audio_to_text()
             if user_input:
@@ -70,6 +73,10 @@ def start():
                 speak(response)  # Responder también con voz
                 if "adiós" in user_input.lower():
                     break
+            time.sleep(0.1)
         except Exception as e:
             print(f"Error: {e}")
             speak("Hubo un problema al procesar el audio, por favor intenta de nuevo.")
+
+def stop(self):
+    self._stop_event.set()

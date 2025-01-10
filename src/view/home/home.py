@@ -20,7 +20,7 @@ import sys
 import os
 from resources.styles.theme import change_theme
 from controller.theme_controller import get_theme_controller
-from controller.process_voice_message_controller import process_voice_message_controller
+from controller.process_voice_message_controller import process_voice_message_controller, stop_process_voice_message_controller
 from view.home.configuration import Configuration
 from view.shared.titlebar import TitleBar
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
@@ -28,6 +28,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '.
 class Home(QMainWindow):        
     def __init__(self):
         super().__init__()
+
+        self.iniciat = False
         
         title_bar = TitleBar()
         title_bar.update_theme_titlebar()
@@ -76,6 +78,15 @@ class Home(QMainWindow):
         self.central_widget.setStyleSheet(f"background-color: {theme_color[1]};")
 
 def start_assistant(self):
-    # Ejecutar `start` en un hilo separado
-    thread = threading.Thread(target=process_voice_message_controller, daemon=True)
-    thread.start()
+    # Crear el hilo con la referencia de la función
+    self.thread = threading.Thread(target=process_voice_message_controller, args=(self,), daemon=True)
+    
+    if self.iniciat:  # Si el asistente ya está en ejecución
+        # Detener el hilo (asumiendo que 'stop_process_voice_message_controller' lo detiene)
+        stop_process_voice_message_controller(self)
+        self.iniciat = False
+    else:
+        # Iniciar el hilo
+        self.thread.start()
+        self.iniciat = True
+

@@ -22,8 +22,7 @@ from controller.save_configuration_controller import save_configuration_controll
 from view.home.change_name import change_name
 from view.home.change_password import change_password
 from controller.sign_out_controller import sign_out_controller
-from controller.theme_controller import update_theme_controller
-from controller.theme_controller import get_theme_controller
+from controller.theme_controller import update_theme_controller, get_theme_controller
 from resources.styles.theme import change_theme
 
 class Configuration(QMainWindow):
@@ -441,7 +440,7 @@ class Configuration(QMainWindow):
         }
 
         self.combobox_theme_5.currentIndexChanged.connect(self.selection_changed)
-
+        self.initialize_theme_from_db(theme)
         main_layout_2.addWidget(self.combobox_theme_5)
 
         # Estilo del QWidget
@@ -568,7 +567,27 @@ class Configuration(QMainWindow):
         update_theme_controller(theme_option)
         self.theme_changed.emit()
         self.update_theme_configuration()
-    
+
+    def initialize_theme_from_db(self, theme):
+
+        theme_index = 0
+        print(theme)
+        if theme == "default":
+            theme_index = 0
+        elif theme == "light":
+            theme_index = 1
+        elif theme == "dark":
+            theme_index = 2
+        elif theme == "pink":
+            theme_index = 3
+        elif theme == "special":
+            theme_index = 4
+        
+        # Configurar el índice inicial del combobox
+        self.combobox_theme_5.blockSignals(True)  # Bloquear señales durante la inicialización
+        self.combobox_theme_5.setCurrentIndex(theme_index)
+        self.combobox_theme_5.blockSignals(False)
+
     def update_theme_configuration(self):
         theme = get_theme_controller()
         theme_color = change_theme(self, theme)
@@ -810,3 +829,21 @@ class Configuration(QMainWindow):
                 background-color: {theme_color[2]};
             }}
         """)
+        
+        theme_index = 0
+        print(theme)
+        if theme == "default":
+            theme_index = 0
+        elif theme == "light":
+            theme_index = 1
+        elif theme == "dark":
+            theme_index = 2
+        elif theme == "pink":
+            theme_index = 3
+        elif theme == "special":
+            theme_index = 4
+        
+        # Configurar el índice inicial del combobox
+        self.combobox_theme_5.blockSignals(True)  # Bloquear señales durante la inicialización
+        self.combobox_theme_5.setCurrentIndex(theme_index)
+        self.combobox_theme_5.blockSignals(False)
