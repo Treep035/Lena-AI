@@ -37,6 +37,7 @@ class Configuration(QMainWindow):
     viewChanged = pyqtSignal(str)
     restart_theme = pyqtSignal()
     account_picture_update_signal = pyqtSignal()
+    account_username_update_signal = pyqtSignal()
     theme_changed = pyqtSignal()
     def __init__(self):
         super().__init__()

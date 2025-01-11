@@ -40,25 +40,6 @@ def transcribe_audio_to_text():
             speak("Hubo un problema con el servicio de reconocimiento.")
         return ""
 
-# Función para generar respuestas
-def generate_response(prompt):
-    response = ""
-    if "hola" in prompt.lower():
-        response = "¡Hola! ¿Cómo podría ayudarte?"
-    elif "hora" in prompt.lower():
-        now = datetime.now()
-        response = f"La hora actual es {now.strftime('%H:%M:%S')}"
-    elif "adiós" in prompt.lower():
-        response = "¡Adiós! ¡Que tengas un buen día!"
-    elif "busca" in prompt.lower():
-        search_query = prompt.lower().replace("busca ", "")
-        search_url = f"https://www.google.com/search?q={search_query}"
-        webbrowser.open(search_url)
-        response = f"Buscando {search_query} en Google."
-    else:
-        response = "Lo siento, no entendí eso. ¿Puedes intentar de nuevo?"
-    return response
-
 def start(self):
     self._stop_event = threading.Event()
     # Hablar al inicio
@@ -68,11 +49,35 @@ def start(self):
         try:
             user_input = transcribe_audio_to_text()
             if user_input:
-                response = generate_response(user_input)
-                print(f"IA: {response}")
-                speak(response)  # Responder también con voz
-                if "adiós" in user_input.lower():
-                    break
+                    response = ""
+                    if "hola" in user_input.lower():
+                        response = "¡Hola! ¿Cómo podría ayudarte?"
+                        speak(response)
+                    elif "hora" in user_input.lower():
+                        now = datetime.now()
+                        response = f"La hora actual es {now.strftime('%H:%M:%S')}"
+                        speak(response)
+                    elif "adiós" in user_input.lower():
+                        response = "¡Adiós! ¡Que tengas un buen día!"
+                        speak(response)
+                    elif "busca" in user_input.lower():
+                        search_query = user_input.lower().replace("busca ", "")
+                        search_url = f"https://www.google.com/search?q={search_query}"
+                        webbrowser.open(search_url)
+                        response = f"Buscando {search_query} en Google."
+                        speak(response)
+                        time.sleep(2)
+                        speak("¿Es esto lo que buscabas?")
+                        user_input = transcribe_audio_to_text()
+                        if user_input == "sí":
+                            break
+                        else:
+                            speak("Entonces que es lo que quieres buscar?")
+                    else:
+                        response = "Lo siento, no entendí eso. ¿Puedes intentar de nuevo?"
+                        speak(response)
+                    if "adiós" in user_input.lower():
+                        break
             time.sleep(0.1)
         except Exception as e:
             print(f"Error: {e}")

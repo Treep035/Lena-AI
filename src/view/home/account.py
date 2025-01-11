@@ -115,6 +115,7 @@ class Account(QMainWindow):
 
         self.configuracion = Configuration.get_instance()
         self.configuracion.account_picture_update_signal.connect(self.update_profile_picture)
+        self.configuracion.account_username_update_signal.connect(self.update_username)
 
         self.username_label = QLabel()
         self.username_label.setAlignment(Qt.AlignCenter)
@@ -154,6 +155,10 @@ class Account(QMainWindow):
         self.profile_pic_label.deleteLater()
 
         self.profile_pic_label = profile_pic_label_updated
+
+    def update_username(self):
+        username = account_username_load_controller()
+        self.username_label.setText(username)
         
     def on_icon_click(self, event, view_name):
         """Maneja el clic en un ícono, verificando si es clic izquierdo."""
