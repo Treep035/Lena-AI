@@ -26,6 +26,8 @@ from datetime import datetime
 from model.database.db_connection import connect_to_db
 from model.auth.validate_fields_login import validate_fields_login
 from model.auth.validate_fields_register import validate_fields_register
+from model.auth.validate_fields_change_password import validate_fields_change_password
+# from model.auth.validate_fields_change_name import validate_fields_change_name
 
 # Función validar los campos del login
 def validate_fields_login_controller(self):
@@ -35,3 +37,10 @@ def validate_fields_login_controller(self):
 
 def validate_fields_register_controller(self):
     validate_fields_register(self)
+
+def validate_fields_change_password_controller(self):
+    no_fields, not_actual_password, invalid_fields, invalid_regex, same_password = validate_fields_change_password(self)
+    return no_fields, not_actual_password, invalid_fields, invalid_regex, same_password
+
+# def validate_fields_change_name_controller(self):
+#     no_fields, invalid_fields, logged_in, id_user = validate_fields_change_name(self)

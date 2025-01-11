@@ -146,7 +146,7 @@ class Login(QMainWindow):
             self.status_label_invalid.show()
             self.status_label_invalid.setText("<a href='#' style='color: #C53B3D ; font-size: 15px; font-weight: bold; text-decoration: none;'>The email or password is incorrect</a>")
             self.status_label_invalid.setAlignment(Qt.AlignCenter)
-            QTimer.singleShot(2000, self.remove_error_message)
+            
         elif logged_in:
             self.main_content_layout.removeWidget(self.status_label_invalid)
             self.status_label_invalid.hide()
