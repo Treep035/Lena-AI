@@ -29,7 +29,8 @@ class Home(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.iniciat = False
+        self.started= False
+        self.already_started= False
         
         title_bar = TitleBar()
         title_bar.update_theme_titlebar()
@@ -81,12 +82,13 @@ def start_assistant(self):
     # Crear el hilo con la referencia de la función
     self.thread = threading.Thread(target=process_voice_message_controller, args=(self,), daemon=True)
     
-    if self.iniciat:  # Si el asistente ya está en ejecución
+    if self.started:  # Si el asistente ya está en ejecución
         # Detener el hilo (asumiendo que 'stop_process_voice_message_controller' lo detiene)
         stop_process_voice_message_controller(self)
-        self.iniciat = False
+        self.started = False
     else:
         # Iniciar el hilo
         self.thread.start()
-        self.iniciat = True
+        self.started = True
 
+    self.already_started = True
