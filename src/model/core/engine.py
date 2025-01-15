@@ -188,20 +188,78 @@ def start(self):
             if user_input:
                 response = ""
 
-                if any(form in user_input.lower() for form in ["reproduce", "musica", "musica de", "cancion", "cancion de", "canciones", "canciones de", "escuchar", "pon", "ponme"]):
-                    match = re.search(r"(reproduce|musica(?: de)?|cancion(?: de)?|canciones(?: de)?|escuchar|pon(?:me)?)\s+(.*)", user_input.lower())
-                    if match and match.group(2):  # Si se encuentra una coincidencia y hay palabras después de la clave
-                        search_query = match.group(2).strip()  # Extraer la parte que viene después de la palabra clave
-                    else:  # Si el usuario no menciona nada después de la palabra clave
-                        speak("¿Qué canción o artista quieres escuchar?")
-                        user_input = transcribe_audio_to_text()
-                        search_query = user_input.lower().strip()
+                if any(form in user_input.lower() for form in ["reproduce", "reproducir", "reproduceme" "musica", "musica de", "cancion", "cancion de", "canciones", "canciones de", "escuchar", "pon", "ponme"]):
+                    reproduce_finished = False
+                    while not reproduce_finished:
+                        match = re.search(r"(reproduce|musica(?: de)?|cancion(?: de)?|canciones(?: de)?|escuchar|pon(?:me)?)\s+(.*)", user_input.lower())
 
-                    search_url = f"https://www.youtube.com/results?search_query={search_query}"
-                    webbrowser.open(search_url)
-                    response = f"Reproduciendo {search_query} en YouTube."
-                    speak(response)
-                    stop(self)
+                        if match and match.group(2):  # Si se encuentra una coincidencia y hay palabras después de la clave
+                            search_query = match.group(2).strip()  # Extraer la parte que viene después de la palabra clave
+                        else:  # Si el usuario no menciona nada después de la palabra clave
+                            speak("¿Qué canción o artista quieres escuchar?")
+                            user_input = transcribe_audio_to_text()
+                            search_query = user_input.lower().strip()
+
+                        load_dotenv()
+                        api_key_youtube = os.getenv('API_KEY_YOUTUBE')
+
+                        def get_youtube_video_url(query, api_key_youtube):
+                            # Hacer la búsqueda en YouTube
+                            url = f"https://www.googleapis.com/youtube/v3/search?part=snippet&q={query}&key={api_key_youtube}"
+                            response = requests.get(url).json()
+                            
+                            # Obtener el primer resultado (ID del video)
+                            if 'items' in response and len(response['items']) > 0:
+                                for item in response['items']:
+                                    # Verifica si el item es un video
+                                    if item['id']['kind'] == 'youtube#video':
+                                        try:
+                                            # Obtén el videoId
+                                            video_id = item['id'].get('videoId')
+                                            if video_id:
+                                                return f"https://www.youtube.com/watch?v={video_id}"
+                                        except KeyError as e:
+                                            print(f"Error de clave en la respuesta de la API: {e}")
+                                            return None
+                                print("No se encontró un video válido.")
+                                return None
+                            else:
+                                print("No se encontraron resultados en YouTube.")
+                                return None
+                        
+                        video_url = get_youtube_video_url(search_query, api_key_youtube)
+
+                        if video_url:
+                            webbrowser.open(video_url)
+                            speak(f"Reproduciendo {search_query} en YouTube.")
+                            reproduce_finished = True
+                            stop(self)
+                        else:
+                            speak(f"No he encontrado resultados para {search_query}.")
+                            time.sleep(1)
+                            speak("¿Necesitas algo más?")
+                            user_input = transcribe_audio_to_text()
+                            if any(palabra in user_input.lower() for palabra in palabras_afirmation):
+                                speak("¿Qué más necesitas?")
+                                user_input = transcribe_audio_to_text()
+                            elif any(palabra in user_input.lower() for palabra in palabras_cancelation):
+                                reproduce_finished = True
+                                stop(self)
+                            else:
+                                reproduce_finished_2 = False
+                                while not reproduce_finished_2:
+                                    speak("¿No te entendí, ¿Necesitas algo más?")
+                                    user_input = transcribe_audio_to_text()
+                                    if any(palabra in user_input.lower() for palabra in palabras_afirmation):
+                                        reproduce_finished_2 = True
+                                        speak("¿Qué más necesitas?")
+                                        user_input = transcribe_audio_to_text()
+                                    elif any(palabra in user_input.lower() for palabra in palabras_cancelation):
+                                        reproduce_finished_2 = True
+                                        reproduce_finished = True
+                                        stop(self)
+                                    else:
+                                        pass
 
                 elif "busca" in user_input.lower():
                     search_finished = False
@@ -493,7 +551,7 @@ def start(self):
                                             else:
                                                 pass
                     except Exception as e:
-                        speak("Lo siento, no pude encontrar una adivinanza en este momento.")
+                        speak("Lo siento, no te puedo contar una adivinanza en este momento.")
 
                 elif any(form in user_input for form in ["chiste", "chistes"]):
                     try:
@@ -535,9 +593,6 @@ def start(self):
                         recognizer = sr.Recognizer()
                         with sr.Microphone() as source:
                             audio = recognizer.listen(source)
-
-                            with open("tit" + ".wav", "wb") as f:
-                                f.write(audio.get_wav_data())
 
                         documents_path = os.path.join(os.path.expanduser("~"))
                         file_path = os.path.join(documents_path, f"{title}.wav")
@@ -592,7 +647,7 @@ def start(self):
                             else:
                                 pass
 
-                elif any(form in user_input for form in ["piedra papel tijeras"]):
+                elif any(form in user_input for form in ["piedra papel tijeras", "piedra papel tijera"]):
                     playing_piedra_papel_tijeras = True
                     while playing_piedra_papel_tijeras:
                         opciones = ["piedra", "papel", "tijeras"]
@@ -605,6 +660,10 @@ def start(self):
                         time.sleep(0.5)
                         speak("Tres")
                         user_input = transcribe_audio_to_text()
+
+                        if "tijera" in user_input.lower():
+                            user_input = "tijeras"
+
                         if user_input.lower() in opciones:
                             if user_input.lower() == resultado.lower():
                                 speak(f"¡Empate! Yo elegí {resultado}")

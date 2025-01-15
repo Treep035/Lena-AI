@@ -59,7 +59,7 @@ class Chat(QMainWindow):
         self.chat_display = QTextEdit(self)
         self.chat_display.setStyleSheet(f"""
             QTextEdit {{
-                color: white; 
+                color: {theme_color[4]}; 
                 background-color: {theme_color[1]}; 
                 border: none;
                 font-size: 15px;
@@ -85,10 +85,56 @@ class Chat(QMainWindow):
         """)
         self.chat_display.setReadOnly(True)  # No se puede escribir directamente aquí
         self.layout.addWidget(self.chat_display)
+
+        # Crear el botón circular en la esquina superior izquierda
+        self.clear_button = QPushButton(self)
+        self.clear_button.setFixedSize(50, 50)  # Tamaño del botón circular
+        self.clear_button.setStyleSheet(f"""
+            QPushButton {{
+                background-color: {theme_color[2]};
+                border: none;
+                border-radius: 25px;  /* Hace que el botón sea perfectamente circular */
+                position: absolute;
+            }}
+            QPushButton:hover {{
+                background-color: {theme_color[0]};
+            }}
+        """)
+        self.clear_button.setCursor(QCursor(Qt.PointingHandCursor))
+
+        # Cargar la imagen dentro del botón
+        self.clear_button.setIcon(QIcon(f"src/resources/images/{theme_color[4]}/clear/clear.png"))
+        self.clear_button.setIconSize(QSize(35, 35))  # Tamaño de la imagen dentro del botón
+
+        self.clear_button.move(10, 10)
+        self.clear_button.clicked.connect(self.clear_chat)
+        # self.layout.addWidget(self.clear_button)
+
+        # Crear el botón de "Flecha hacia abajo"
+        self.scroll_button = QPushButton(self)
+        self.scroll_button.setFixedSize(35, 35)
+        self.scroll_button.setStyleSheet(f"""
+            QPushButton {{
+                background-color: {theme_color[2]};
+                border: none;
+                border-radius: 17px;
+            }}
+            QPushButton:hover {{
+                background-color: {theme_color[0]};
+            }}
+        """)
+        self.scroll_button.setCursor(QCursor(Qt.PointingHandCursor))
+        self.scroll_button.setIcon(QIcon(f"src/resources/images/{theme_color[4]}/downarrow/downarrow.png"))
+        self.scroll_button.setIconSize(QSize(15, 15))
+        self.scroll_button.clicked.connect(self.scroll_to_bottom)
+        self.scroll_button.hide()  # Ocultar inicialmente
+
+        # Conectar el evento de scroll
+        self.chat_display.verticalScrollBar().valueChanged.connect(self.handle_scroll)
         
         # Crear un layout horizontal para el cuadro de entrada y el botón de envío
         self.input_layout = QHBoxLayout()
-        self.input_layout.setContentsMargins(0, 15, 0, 0)
+        self.input_layout.setContentsMargins(0, 2, 0, 0)
         
         # Crear el cuadro de entrada para nuevos mensajes
         self.message_input = QLineEdit(self)
@@ -137,8 +183,30 @@ class Chat(QMainWindow):
         self.configuracion = Configuration.get_instance()
         self.configuracion.theme_changed.connect(self.update_theme_chat)
         
-    def send_message(self):
+    def handle_scroll(self):
+        scrollbar = self.chat_display.verticalScrollBar()
+        if scrollbar.value() < scrollbar.maximum():  # Usuario no está en el final
+            self.scroll_button.show()
+        else:  # Usuario está en el final
+            self.scroll_button.hide()
 
+    def scroll_to_bottom(self):
+        scrollbar = self.chat_display.verticalScrollBar()
+        self.scroll_timer = QTimer(self)
+        self.scroll_timer.timeout.connect(lambda: self.smooth_scroll(scrollbar))
+        self.scroll_timer.start(5)  # Velocidad rápida
+
+    def smooth_scroll(self, scrollbar):
+        current_value = scrollbar.value()
+        max_value = scrollbar.maximum()
+        step = 15  # Velocidad de desplazamiento
+        if current_value + step >= max_value:
+            scrollbar.setValue(max_value)
+            self.scroll_timer.stop()
+        else:
+            scrollbar.setValue(current_value + step)
+
+    def send_message(self):
         theme = get_theme_controller()
         theme_color = change_theme(self, theme)
 
@@ -192,6 +260,7 @@ class Chat(QMainWindow):
             current_content = self.chat_display.toHtml()
             self.chat_display.setHtml(current_content + user_message)
             self.chat_display.moveCursor(QTextCursor.End)
+            self.chat_display.verticalScrollBar().setValue(self.chat_display.verticalScrollBar().maximum())
 
             self.message_input.clear()
 
@@ -216,6 +285,15 @@ class Chat(QMainWindow):
         current_content = self.chat_display.toHtml()
         self.chat_display.setHtml(current_content + bot_message)
         self.chat_display.moveCursor(QTextCursor.End)
+        self.chat_display.verticalScrollBar().setValue(self.chat_display.verticalScrollBar().maximum())
+
+    def clear_chat(self):
+        self.chat_display.clear()
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self.clear_button.move(10, 10)
+        self.scroll_button.move(self.width() - 240, self.height() - 100)
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter:
@@ -232,9 +310,32 @@ class Chat(QMainWindow):
         theme = get_theme_controller()
         theme_color = change_theme(self, theme)
         self.central_widget.setStyleSheet(f"background-color: {theme_color[1]}")
+        self.clear_button.setStyleSheet(f"""
+            QPushButton {{
+                background-color: {theme_color[2]};
+                border: none;
+                border-radius: 25px;  /* Hace que el botón sea perfectamente circular */
+                position: absolute;
+            }}
+            QPushButton:hover {{
+                background-color: {theme_color[0]};
+            }}
+        """)
+        self.clear_button.setIcon(QIcon(f"src/resources/images/{theme_color[4]}/clear/clear.png"))
+        self.scroll_button.setStyleSheet(f"""
+            QPushButton {{
+                background-color: {theme_color[2]};
+                border: none;
+                border-radius: 17px;
+            }}
+            QPushButton:hover {{
+                background-color: {theme_color[0]};
+            }}
+        """)
+        self.scroll_button.setIcon(QIcon(f"src/resources/images/{theme_color[4]}/downarrow/downarrow.png"))
         self.chat_display.setStyleSheet(f"""
             QTextEdit {{
-                color: white; 
+                color: {theme_color[4]}; 
                 background-color: {theme_color[1]}; 
                 border: none;
                 font-size: 15px;
@@ -287,3 +388,6 @@ class Chat(QMainWindow):
                 background-color: {theme_color[0]};  /* Color al pasar el cursor */
             }}
         """)
+        # current_content = self.chat_display.toHtml()  # Obtener el contenido actual
+        # self.chat_display.clear()  # Limpiar el QTextEdit
+        # self.chat_display.setHtml(current_content)

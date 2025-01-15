@@ -293,7 +293,8 @@ class Configuration(QMainWindow):
         self.profileLanguageButton.setMaximumHeight(65)
 
         # Crear el layout principal de self.uno
-        main_layout = QHBoxLayout(self.profileLanguageButton)
+        main_layout_final_2 = QHBoxLayout(self.profileLanguageButton)
+        main_layout = QHBoxLayout()
 
         # Crear QLabel para mostrar la imagen
         self.change_profile_pic_icon_4 = QPixmap(f"src/resources/images/{theme_color[4]}/language/language.png")
@@ -325,12 +326,56 @@ class Configuration(QMainWindow):
                 background-color: transparent;  /* Evitar que tenga fondo */
                 padding-left: 10px;  /* Alinear texto con la imagen */
             }}
-            QLabel:hover {{
-                background-color: transparent;  /* El fondo sigue siendo transparente */
-            }}
         """)
 
         main_layout.addWidget(self.label_4)
+
+        main_layout_3 = QHBoxLayout()
+
+        self.combobox_languages_4 = QComboBox()
+        self.combobox_languages_4.addItems(["Inglés", "Español"])  # Agregar elementos
+        main_layout_3.setAlignment(Qt.AlignRight)
+        self.combobox_languages_4.setStyleSheet(f"""
+            QComboBox {{
+                color: {theme_color[4]};  /* Cambiar color del texto */
+                background-color: {theme_color[0]};  /* Evitar que tenga fondo */
+                border-radius: 5px;  /* Bordes redondeados */
+                padding: 5px;  /* Espaciado interno */
+            }}
+            QComboBox:hover {{
+                background-color: rgba(255, 255, 255, 0.1);  /* El fondo sigue siendo transparente */
+            }}
+            QComboBox::drop-down {{
+            }}
+            QComboBox::down-arrow {{
+            }}
+            QComboBox QAbstractItemView {{
+                background-color: {theme_color[2]};  /* Color de fondo del menú desplegable */
+                color: {theme_color[4]};  /* Color del texto en el menú */
+                selection-background-color: {theme_color[0]};
+                selection-color: {theme_color[4]};  /* Color del texto del elemento seleccionado */
+                border-radius: 5px;  /* Bordes redondeados */
+                outline: none;  /* Evitar el contorno */
+                padding: 5px;
+                spacing: 10px;  /* Espaciado entre las opciones */
+            }}
+            QComboBox QAbstractItemView::item {{
+                padding-left: 15px;  /* Espaciado interno izquierdo */
+                padding-right: 15px;  /* Espaciado interno derecho */
+                padding-top: 10px;  /* Espaciado interno superior */
+                padding-bottom: 10px;  /* Espaciado interno inferior */
+            }}
+        """)
+        self.combobox_languages_4.setCursor(QCursor(Qt.PointingHandCursor))
+
+        self.languages = {
+            0: "inglés",   # Opción 1
+            1: "español",    # Opción 2
+        }
+
+        # self.combobox_languages_4.currentIndexChanged.connect(self.selection_changed)
+        # self.initialize_theme_from_db(theme)
+        main_layout_3.addWidget(self.combobox_languages_4)
 
         # Estilo del QWidget
         self.profileLanguageButton.setStyleSheet(f"""
@@ -344,13 +389,10 @@ class Configuration(QMainWindow):
                 text-align: left;
                 padding-left: 15px;
             }}
-            QWidget:hover {{
-                background-color: {theme_color[2]};
-            }}
         """)
 
-        # Cambiar el cursor a un puntero de mano al pasar sobre el widget
-        self.profileLanguageButton.setCursor(QCursor(Qt.PointingHandCursor))
+        main_layout_final_2.addLayout(main_layout)
+        main_layout_final_2.addLayout(main_layout_3)
 
         # Añadir el widget al layout principal
         self.options_content_layout.addWidget(self.profileLanguageButton, alignment=Qt.AlignCenter)
@@ -738,6 +780,37 @@ class Configuration(QMainWindow):
                 background-color: transparent;  /* El fondo sigue siendo transparente */
             }}
         """)
+        self.combobox_languages_4.setStyleSheet(f"""
+            QComboBox {{
+                color: {theme_color[4]};  /* Cambiar color del texto */
+                background-color: {theme_color[0]};  /* Evitar que tenga fondo */
+                border-radius: 5px;  /* Bordes redondeados */
+                padding: 5px;  /* Espaciado interno */
+            }}
+            QComboBox:hover {{
+                background-color: rgba(255, 255, 255, 0.1);  /* El fondo sigue siendo transparente */
+            }}
+            QComboBox::drop-down {{
+            }}
+            QComboBox::down-arrow {{
+            }}
+            QComboBox QAbstractItemView {{
+                background-color: {theme_color[2]};  /* Color de fondo del menú desplegable */
+                color: {theme_color[4]};  /* Color del texto en el menú */
+                selection-background-color: {theme_color[0]};
+                selection-color: {theme_color[4]};  /* Color del texto del elemento seleccionado */
+                border-radius: 5px;  /* Bordes redondeados */
+                outline: none;  /* Evitar el contorno */
+                padding: 5px;
+                spacing: 10px;  /* Espaciado entre las opciones */
+            }}
+            QComboBox QAbstractItemView::item {{
+                padding-left: 15px;  /* Espaciado interno izquierdo */
+                padding-right: 15px;  /* Espaciado interno derecho */
+                padding-top: 10px;  /* Espaciado interno superior */
+                padding-bottom: 10px;  /* Espaciado interno inferior */
+            }}
+        """)
         self.profileLanguageButton.setStyleSheet(f"""
             QWidget {{
                 background-color: {theme_color[0]};
@@ -748,9 +821,6 @@ class Configuration(QMainWindow):
                 font-size: 18px;
                 text-align: left;
                 padding-left: 15px;
-            }}
-            QWidget:hover {{
-                background-color: {theme_color[2]};
             }}
         """)
 
