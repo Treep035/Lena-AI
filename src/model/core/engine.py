@@ -27,23 +27,23 @@ def speak(text):
 def transcribe_audio_to_text():
     recognizer = sr.Recognizer()
     with sr.Microphone() as source:
-        recognizer.energy_threshold = 4000
-        recognizer.dynamic_energy_adjustment = True
-        print("Escuchando...")
         recognizer.adjust_for_ambient_noise(source)  # Ajustar para ruido ambiental
-        try:
-            audio = recognizer.listen(source)  # Capturar el audio
-            # Convertir el audio a texto usando Google Web Speech API
-            text = recognizer.recognize_google(audio, language="es-ES")
-            print(f"Texto detectado: {text}")
-            return text
-        except sr.UnknownValueError:
-            print("No se pudo entender el audio.")
-            speak("Lo siento, no entendí lo que dijiste.")
-        except sr.RequestError as e:
-            print(f"Error con el servicio de reconocimiento: {e}")
-            speak("Hubo un problema con el servicio de reconocimiento.")
-        return ""
+        print("Escuchando...")  # Mover el print aquí
+        close = False
+        while close == False:
+            try:
+                audio = recognizer.listen(source)  # Capturar el audio
+                # Convertir el audio a texto usando Google Web Speech API
+                text = recognizer.recognize_google(audio, language="es-ES")
+                print(f"Texto detectado: {text}")
+                close = True
+                return text
+            except sr.UnknownValueError:
+                print("No se pudo entender el audio.")
+            except sr.RequestError as e:
+                print(f"Error con el servicio de reconocimiento: {e}")
+                speak("Hubo un problema con el servicio de reconocimiento.")
+                return ""
 
 def stop(self):
     self._stop_event.set()
@@ -51,129 +51,129 @@ def stop(self):
 
 def start(self):
     palabras_cancelation = [
-    "adiós", "nada", "no", "cancelar", "detener", 
-    "salir", "cerrar", "terminar", "finalizar", 
-    "acabar", "terminado", "finalizado", "stop", "exit",
-    "cancel", "end", "finish", "finished", "bye", "nothing",
+        "adiós", "nada", "no", "cancelar", "detener", 
+        "salir", "cerrar", "terminar", "finalizar", 
+        "acabar", "terminado", "finalizado", "stop", "exit",
+        "cancel", "end", "finish", "finished", "bye", "nothing",
     ]
     palabras_afirmation = [
-    "sí", "claro", "correcto", "correctamente", "por supuesto",
-    "definitivamente", "exactamente", "afirmativo", "vale", 
-    "de acuerdo", "seguro", "perfecto", "obvio", "así es", 
-    "cierto", "sin duda", "naturalmente", "confirmado",
-    "en efecto", "está bien", "es cierto", "evidentemente",
-    "ya lo creo", "tienes razón", "ok", "okay", "yeah", 
-    "yes", "of course", "sure", "definitely", "absolutely", 
-    "that’s right", "correct", "exactly", "fine", "all right",
-    "agreed", "indeed", "confirmed", "roger that", "affirmative"
+        "sí", "claro", "correcto", "correctamente", "por supuesto",
+        "definitivamente", "exactamente", "afirmativo", "vale", 
+        "de acuerdo", "seguro", "perfecto", "obvio", "así es", 
+        "cierto", "sin duda", "naturalmente", "confirmado",
+        "en efecto", "está bien", "es cierto", "evidentemente",
+        "ya lo creo", "tienes razón", "ok", "okay", "yeah", 
+        "yes", "of course", "sure", "definitely", "absolutely", 
+        "that’s right", "correct", "exactly", "fine", "all right",
+        "agreed", "indeed", "confirmed", "roger that", "affirmative"
     ]
     programas_disponibles = {
-            "calculadora": "calc",  # En Windows
-            "bloc de notas": "notepad",  # En Windows
-            "navegador": "https://www.google.com",  # Cambiar por el navegador instalado
-            "explorador": "explorer",  # Explorador de archivos en Windows
-            "word": "winword",  # Microsoft Word en Windows
-            "excel": "excel",  # Abre Microsoft Excel
-            "powerpoint": "powerpnt", # Abre Microsoft PowerPoint
-            "onenote": "onenote",  # Abre Microsoft OneNote
-            "outlook": "outlook",  # Abre Microsoft Outlook
-            "paint": "mspaint",  # Abre Paint en Windows
-            "panel de control": "control",  # Abre el Panel de Control en Windows
-            "cmd": "cmd",  # Abre el Símbolo del Sistema en Windows
-            "powershell": "powershell",  # Abre PowerShell en Windows
+        "calculadora": "calc",  # En Windows
+        "bloc de notas": "notepad",  # En Windows
+        "navegador": "https://www.google.com",  # Cambiar por el navegador instalado
+        "explorador": "explorer",  # Explorador de archivos en Windows
+        "word": "winword",  # Microsoft Word en Windows
+        "excel": "excel",  # Abre Microsoft Excel
+        "powerpoint": "powerpnt", # Abre Microsoft PowerPoint
+        "onenote": "onenote",  # Abre Microsoft OneNote
+        "outlook": "outlook",  # Abre Microsoft Outlook
+        "paint": "mspaint",  # Abre Paint en Windows
+        "panel de control": "control",  # Abre el Panel de Control en Windows
+        "cmd": "cmd",  # Abre el Símbolo del Sistema en Windows
+        "powershell": "powershell",  # Abre PowerShell en Windows
 
-            # Herramientas del sistema
-            "administrador de tareas": "taskmgr",
-            "panel de control": "control",
-            "símbolo del sistema": "cmd",
-            "powershell": "powershell",
-            "herramientas del sistema": "msconfig",
-            "información del sistema": "msinfo32",
-            "registro de windows": "regedit",
+        # Herramientas del sistema
+        "administrador de tareas": "taskmgr",
+        "panel de control": "control",
+        "símbolo del sistema": "cmd",
+        "powershell": "powershell",
+        "herramientas del sistema": "msconfig",
+        "información del sistema": "msinfo32",
+        "registro de windows": "regedit",
 
-            # Aplicaciones de oficina
-            "onenote": "onenote",
-            "microsoft access": "msaccess",
-            "libreoffice writer": "soffice --writer",
-            "libreoffice calc": "soffice --calc",
-            "google docs": "https://docs.google.com",
+        # Aplicaciones de oficina
+        "onenote": "onenote",
+        "microsoft access": "msaccess",
+        "libreoffice writer": "soffice --writer",
+        "libreoffice calc": "soffice --calc",
+        "google docs": "https://docs.google.com",
 
-            # Aplicaciones de navegación e internet
-            "mozilla firefox": "firefox",
-            "microsoft edge": "msedge",
-            "google chrome": "chrome",
-            "opera": "opera",
-            "skype": "skype",
-            "discord": "discord",
-            "zoom": "zoom",
-            "teams": "teams",
+        # Aplicaciones de navegación e internet
+        "mozilla firefox": "firefox",
+        "microsoft edge": "msedge",
+        "google chrome": "chrome",
+        "opera": "opera",
+        "skype": "skype",
+        "discord": "discord",
+        "zoom": "zoom",
+        "teams": "teams",
 
-            # Aplicaciones multimedia
-            "reproductor de música": "wmplayer",
-            "vlc media player": "vlc",
-            "spotify": "spotify",
-            "audacity": "audacity",
-            "galería de fotos": "ms-photos:",
-            "editor de video": "moviemaker",
+        # Aplicaciones multimedia
+        "reproductor de música": "wmplayer",
+        "vlc media player": "vlc",
+        "spotify": "spotify",
+        "audacity": "audacity",
+        "galería de fotos": "ms-photos:",
+        "editor de video": "moviemaker",
 
-            # Aplicaciones de diseño y edición
-            "paint": "mspaint",
-            "photoshop": "photoshop",
-            "gimp": "gimp",
-            "inkscape": "inkscape",
-            "coreldraw": "coreldraw",
+        # Aplicaciones de diseño y edición
+        "paint": "mspaint",
+        "photoshop": "photoshop",
+        "gimp": "gimp",
+        "inkscape": "inkscape",
+        "coreldraw": "coreldraw",
 
-            # Herramientas de desarrollo
-            "visual studio code": "code",
-            "intellij idea": "idea",
-            "eclipse": "eclipse",
-            "pycharm": "pycharm",
-            "xampp": "xampp-control",
-            "git bash": "git-bash",
+        # Herramientas de desarrollo
+        "visual studio code": "code",
+        "intellij idea": "idea",
+        "eclipse": "eclipse",
+        "pycharm": "pycharm",
+        "xampp": "xampp-control",
+        "git bash": "git-bash",
 
-            # Aplicaciones para juegos
-            "steam": "steam",
-            "epic games launcher": "epicgameslauncher",
-            "blizzard battle.net": "battle.net",
-            "riot client": "riotclient",
+        # Aplicaciones para juegos
+        "steam": "steam",
+        "epic games launcher": "epicgameslauncher",
+        "blizzard battle.net": "battle.net",
+        "riot client": "riotclient",
 
-            # Herramientas de comunicación y productividad
-            "slack": "slack",
-            "notion": "notion",
-            "trello": "trello",
-            "asana": "asana",
+        # Herramientas de comunicación y productividad
+        "slack": "slack",
+        "notion": "notion",
+        "trello": "trello",
+        "asana": "asana",
 
-            # Utilidades adicionales
-            "bloc de dibujos": "inkscape",
-            "control remoto": "teamviewer",
-            "compresor de archivos": "winrar",
-            "administrador de descargas": "idman"
-        }
+        # Utilidades adicionales
+        "bloc de dibujos": "inkscape",
+        "control remoto": "teamviewer",
+        "compresor de archivos": "winrar",
+        "administrador de descargas": "idman"
+    }
     
     chistes = [
-            "¿Por qué los pájaros no usan Facebook? Porque ya tienen Twitter.",
-            "¿Qué le dice un jardinero a otro? ¡Qué planta!",
-            "¿Qué le dice un árbol a otro? ¡Qué pasa, tronco!",
-            "¿Qué le dice un pez a otro pez? ¡Nada!",
-            "¿Qué le dice una iguana a su hermana gemela? ¡Iguanita!",
-            "¿Qué le dice un huevo a otro huevo? ¡Huevo hermano!",
-            "¿Por qué los pájaros no usan WhatsApp? Porque ya tienen Line.",
-            "¿Qué le dice un semáforo a otro? ¡No me mires, que me pongo rojo!",
-            "¿Qué le dice una impresora a otra? ¡Eres la hoja de mi vida!",
-        ]
+        "¿Por qué los pájaros no usan Facebook? Porque ya tienen Twitter.",
+        "¿Qué le dice un jardinero a otro? ¡Qué planta!",
+        "¿Qué le dice un árbol a otro? ¡Qué pasa, tronco!",
+        "¿Qué le dice un pez a otro pez? ¡Nada!",
+        "¿Qué le dice una iguana a su hermana gemela? ¡Iguanita!",
+        "¿Qué le dice un huevo a otro huevo? ¡Huevo hermano!",
+        "¿Por qué los pájaros no usan WhatsApp? Porque ya tienen Line.",
+        "¿Qué le dice un semáforo a otro? ¡No me mires, que me pongo rojo!",
+        "¿Qué le dice una impresora a otra? ¡Eres la hoja de mi vida!",
+    ]
     
     adivinanzas = [
-            {"pregunta": "Blanca por dentro, verde por fuera. Si quieres que te lo diga, espera.", "respuesta": "La pera"},
-            {"pregunta": "Tengo agujas, pero no pincho; paso el tiempo, pero no me quejo.", "respuesta": "El reloj"},
-            {"pregunta": "Soy un rey y vivo en el mar. Todos me temen, pero no me pueden capturar.", "respuesta": "El tiburón"},
-            {"pregunta": "Cuanto más lavo, más sucio está. ¿Qué es?", "respuesta": "El agua"},
-            {"pregunta": "Vuela sin alas, silba sin boca. ¿Qué es?", "respuesta": "El viento"},
-            {"pregunta": "Tiene cabeza, pero no cerebro; tiene boca, pero no habla. ¿Qué es?", "respuesta": "El ajo"},
-            {"pregunta": "Oro parece, plata no es. ¿Qué es?", "respuesta": "El plátano"},
-            {"pregunta": "Cuanto más grande es, menos se ve. ¿Qué es?", "respuesta": ("La oscuridad", "oscuridad")},
-            {"pregunta": "No es ni humano ni animal, pero tiene corazón. ¿Qué es?", "respuesta": "La alcachofa"},
-            {"pregunta": "Soy redondo y siempre estoy en el cielo, pero nunca me caigo. ¿Qué soy?", "respuesta": "El sol"}
-        ]
+        {"pregunta": "Blanca por dentro, verde por fuera. Si quieres que te lo diga, espera.", "respuesta": "La pera"},
+        {"pregunta": "Tengo agujas, pero no pincho; paso el tiempo, pero no me quejo.", "respuesta": "El reloj"},
+        {"pregunta": "Soy un rey y vivo en el mar. Todos me temen, pero no me pueden capturar.", "respuesta": "El tiburón"},
+        {"pregunta": "Cuanto más lavo, más sucio está. ¿Qué es?", "respuesta": "El agua"},
+        {"pregunta": "Vuela sin alas, silba sin boca. ¿Qué es?", "respuesta": "El viento"},
+        {"pregunta": "Tiene cabeza, pero no cerebro; tiene boca, pero no habla. ¿Qué es?", "respuesta": "El ajo"},
+        {"pregunta": "Oro parece, plata no es. ¿Qué es?", "respuesta": "El plátano"},
+        {"pregunta": "Cuanto más grande es, menos se ve. ¿Qué es?", "respuesta": "La oscuridad"},
+        {"pregunta": "No es ni humano ni animal, pero tiene corazón. ¿Qué es?", "respuesta": "La alcachofa"},
+        {"pregunta": "Soy redondo y siempre estoy en el cielo, pero nunca me caigo. ¿Qué soy?", "respuesta": "El sol"}
+    ]
 
 
     self._stop_event = threading.Event()
@@ -188,14 +188,20 @@ def start(self):
             if user_input:
                 response = ""
 
-                if any(form in user_input.lower() for form in ["reproduce", "musica", "cancion", "canciones", "escuchar", "pon", "ponme", "poner"]):
-                    speak("¿Qué canción o artista quieres escuchar?")
-                    user_input = transcribe_audio_to_text()
-                    search_query = user_input.lower().replace("reproduce ", "").replace("música de ", "").replace("musica de ", "")
+                if any(form in user_input.lower() for form in ["reproduce", "musica", "musica de", "cancion", "cancion de", "canciones", "canciones de", "escuchar", "pon", "ponme"]):
+                    match = re.search(r"(reproduce|musica(?: de)?|cancion(?: de)?|canciones(?: de)?|escuchar|pon(?:me)?)\s+(.*)", user_input.lower())
+                    if match and match.group(2):  # Si se encuentra una coincidencia y hay palabras después de la clave
+                        search_query = match.group(2).strip()  # Extraer la parte que viene después de la palabra clave
+                    else:  # Si el usuario no menciona nada después de la palabra clave
+                        speak("¿Qué canción o artista quieres escuchar?")
+                        user_input = transcribe_audio_to_text()
+                        search_query = user_input.lower().strip()
+
                     search_url = f"https://www.youtube.com/results?search_query={search_query}"
                     webbrowser.open(search_url)
-                    response = f"Reproduciendo música de {search_query} en YouTube."
+                    response = f"Reproduciendo {search_query} en YouTube."
                     speak(response)
+                    stop(self)
 
                 elif "busca" in user_input.lower():
                     search_finished = False
@@ -264,25 +270,28 @@ def start(self):
                                 open_finished = True
                                 stop(self)
 
-                elif any(form in user_input.lower() for form in ["explica", "que es", "quien es", "definicion de", "definicion", "definir","que significa"]):
+                elif any(form in user_input.lower() for form in ["explica", "qué es", "quién es", "definición de", "definición", "definir", "qué significa"]):
                     wikipedia_finished = False
                     while not wikipedia_finished:
-                        consulta = re.sub(r"(explica|que es|quien es|definicion de|definicion|definir|que significa)", "", user_input, flags=re.IGNORECASE).strip()
+                        consulta = re.sub(r"(explica|qué es|quién es|definición de|definición|definir|qué significa)", "", user_input, flags=re.IGNORECASE).strip()
                         try:
                             wikipedia.set_lang("es")  # Establece el idioma a español
                             # Busca el término en Wikipedia
                             resultados = wikipedia.search(consulta)
                             if resultados:
                                 # Obtén el resumen del primer resultado
-                                resumen = wikipedia.summary(resultados[0], sentences=2)  # Resumen de 3 frases
+                                resumen = wikipedia.summary(resultados[0], sentences=1)  # Resumen de 3 frases
                                 resumen_limpio = re.sub(r'\[\d+\]', '', resumen)
                                 speak(f"Segun Wikipedia: {resumen_limpio}")
                                 time.sleep(1)
                                 speak("¿Tienes alguna consulta más?")
                                 user_input = transcribe_audio_to_text()
+                                wikipedia_finished_2 = False
                                 while not wikipedia_finished_2:
                                     if any(palabra in user_input.lower() for palabra in palabras_afirmation):
                                         wikipedia_finished_2 = True
+                                        speak("¿Qué más quieres saber?")
+                                        user_input = transcribe_audio_to_text()
                                     elif any(palabra in user_input.lower() for palabra in palabras_cancelation):
                                         wikipedia_finished_2 = True
                                         wikipedia_finished = True
@@ -295,6 +304,7 @@ def start(self):
                                             if any(palabra in user_input.lower() for palabra in palabras_afirmation):
                                                 wikipedia_finished_3 = True
                                                 wikipedia_finished_2 = True
+                                                speak("¿Qué más quieres saber?")
                                                 user_input = transcribe_audio_to_text()
                                             elif any(palabra in user_input.lower() for palabra in palabras_cancelation):
                                                 wikipedia_finished_3 = True
@@ -308,9 +318,11 @@ def start(self):
                                 time.sleep(1)
                                 speak("¿Tienes alguna consulta más?")
                                 user_input = transcribe_audio_to_text()
+                                wikipedia_finished_4 = False
                                 while not wikipedia_finished_4:
                                     if any(palabra in user_input.lower() for palabra in palabras_afirmation):
                                         wikipedia_finished_4 = True
+                                        speak("¿Qué más quieres saber?")
                                         user_input = transcribe_audio_to_text()
                                     elif any(palabra in user_input.lower() for palabra in palabras_cancelation):
                                         wikipedia_finished_4 = True
@@ -324,6 +336,7 @@ def start(self):
                                             if any(palabra in user_input.lower() for palabra in palabras_afirmation):
                                                 wikipedia_finished_5 = True
                                                 wikipedia_finished_4 = True
+                                                speak("¿Qué más quieres saber?")
                                                 user_input = transcribe_audio_to_text()
                                             elif any(palabra in user_input.lower() for palabra in palabras_cancelation):
                                                 wikipedia_finished_5 = True
@@ -338,12 +351,14 @@ def start(self):
                             speak("No se encontró una página relacionada en Wikipedia.")
                         except Exception as e:
                             speak(f"Hubo un error al buscar en Wikipedia: {str(e)}")
+                            print(f"Error al buscar en Wikipedia: {str(e)}")
 
                 elif re.search(r'clima\s+(?:de|en)?\s*(\w+)', user_input.lower()):
+                    match = re.search(r'clima\s+(?:de|en)?\s*(\w+)', user_input.lower())
+                    city = match.group(1)
                     climate_finished = False
                     while not climate_finished:
-                        match = re.search(r'clima\s+(?:de|en)?\s*(\w+)', user_input.lower())
-                        city = match.group(1)
+                        
                         load_dotenv()
                         api_key_climate = os.getenv('API_KEY_CLIMATE')
 
@@ -365,7 +380,7 @@ def start(self):
                                 viento = data['wind']['speed']
                                 
                                 # Mostrar los resultados
-                                climate = f"{temperatura}°C, {descripcion}, Humedad: {humedad}%, Viento: {viento} m/s"
+                                climate = f"{temperatura}°C, {descripcion}, humedad del {humedad}% y viento de {viento} m/s"
                                 # speak(f"Clima en {city.capitalize()}:")
                                 # speak(f"Temperatura: {temperatura}°C")
                                 # speak(f"Descripción: {descripcion}")
@@ -387,8 +402,10 @@ def start(self):
                             climate_finished_2 = False
                             while not climate_finished_2:
                                 if any(palabra in user_input.lower() for palabra in palabras_afirmation):
+                                    speak("¿De qué ciudad?")
                                     climate_finished_2 = True
                                     user_input = transcribe_audio_to_text()
+                                    city = user_input.strip()
                                 elif any(palabra in user_input.lower() for palabra in palabras_cancelation):
                                     climate_finished_2 = True
                                     climate_finished = True
@@ -399,9 +416,11 @@ def start(self):
                                         speak("¿No te entendí, ¿quieres saber el clima de otra ciudad?")
                                         user_input = transcribe_audio_to_text()
                                         if any(palabra in user_input.lower() for palabra in palabras_afirmation):
+                                            speak("¿De qué ciudad?")
                                             climate_finished_3 = True
                                             climate_finished_2 = True
                                             user_input = transcribe_audio_to_text()
+                                            city = user_input.strip()
                                         elif any(palabra in user_input.lower() for palabra in palabras_cancelation):
                                             climate_finished_3 = True
                                             climate_finished_2 = True
@@ -424,7 +443,9 @@ def start(self):
                             speak(adivinanza_actual["pregunta"])
                             user_input = transcribe_audio_to_text()
                             if user_input.lower() == adivinanza_actual["respuesta"].lower():
-                                speak("¡Correcto! ¿Quieres intentar otra adivinanza?")
+                                speak("¡Correcto, enhorabuena!")
+                                time.sleep(1)
+                                speak("¿Quieres intentar otra adivinanza?")
                                 user_input = transcribe_audio_to_text()
                                 if any(palabra in user_input.lower() for palabra in palabras_afirmation):
                                     adivinanza_finished = False
@@ -435,6 +456,7 @@ def start(self):
                                     adivinanza_finished_2 = False
                                     while not adivinanza_finished_2:
                                         speak("¿No te entendí, ¿quieres intentar otra adivinanza?")
+                                        user_input = transcribe_audio_to_text()
                                         if any(palabra in user_input.lower() for palabra in palabras_afirmation):
                                             adivinanza_finished_2 = True
                                         elif any(palabra in user_input.lower() for palabra in palabras_cancelation):
@@ -444,7 +466,9 @@ def start(self):
                                         else:
                                             pass
                             else:
-                                speak(f"Incorrecto. La respuesta correcta era {adivinanza_actual['respuesta']} ¿Quieres intentar otra adivinanza?")
+                                speak(f"Incorrecto. La respuesta correcta era {adivinanza_actual['respuesta']}.")
+                                time.sleep(1)
+                                speak("¿Quieres intentar otra adivinanza?")
                                 user_input = transcribe_audio_to_text()
                                 adivinanza_finished_3 = False
                                 while not adivinanza_finished_3:
@@ -504,12 +528,21 @@ def start(self):
                 elif any(form in user_input for form in ["nota de voz", "grabar nota", "grabar nota de voz", "audio", "grabar audio"]):
                     audio_finished = False
                     while not audio_finished:
-                        speak("¿Qué quieres grabar en la nota de voz?")
+                        speak("¿Título de la grabación?")
                         user_input = transcribe_audio_to_text()
+                        title = user_input
+                        speak("Empieza a grabar tu nota de voz. Ya puedes hablar.")
+                        recognizer = sr.Recognizer()
+                        with sr.Microphone() as source:
+                            audio = recognizer.listen(source)
+
+                            with open("tit" + ".wav", "wb") as f:
+                                f.write(audio.get_wav_data())
+
                         documents_path = os.path.join(os.path.expanduser("~"))
-                        file_path = os.path.join(documents_path, "nota_de_voz.mp3")
+                        file_path = os.path.join(documents_path, f"{title}.wav")
                         with open(file_path, "wb") as f:
-                            f.write(user_input.get_wav_data())
+                            f.write(audio.get_wav_data())
                         speak(f"Nota de voz guardada como {file_path}.")
                         speak ("¿Quieres grabar otra nota de voz?")
                         user_input = transcribe_audio_to_text()
@@ -540,13 +573,31 @@ def start(self):
                 elif any(form in user_input for form in ["cara o cruz"]):
                     resultado = random.choice(["Cara", "Cruz"])
                     speak(f"Ha salido {resultado}.")
+                    speak("¿Necesitas algo más?")
+                    user_input = transcribe_audio_to_text()
+                    if any(palabra in user_input.lower() for palabra in palabras_afirmation):
+                        speak("¿Qué más necesitas?")
+                    elif any(palabra in user_input.lower() for palabra in palabras_cancelation):
+                        stop(self)
+                    else:
+                        cara_o_cruz_finished = False
+                        while not cara_o_cruz_finished:
+                            speak("¿No te entendí, ¿Necesitas algo más?")
+                            user_input = transcribe_audio_to_text()
+                            if any(palabra in user_input.lower() for palabra in palabras_afirmation):
+                                cara_o_cruz_finished = True
+                            elif any(palabra in user_input.lower() for palabra in palabras_cancelation):
+                                cara_o_cruz_finished = True
+                                stop(self)
+                            else:
+                                pass
 
                 elif any(form in user_input for form in ["piedra papel tijeras"]):
                     playing_piedra_papel_tijeras = True
                     while playing_piedra_papel_tijeras:
                         opciones = ["piedra", "papel", "tijeras"]
                         resultado = random.choice(opciones)
-                        speak("A la de tres elige: Piedra, Papel o Tijeras.")
+                        speak("Juguemos, a la de tres elige: Piedra, Papel o Tijeras.")
                         time.sleep(0.5)
                         speak("Uno")
                         time.sleep(0.5)
@@ -653,10 +704,28 @@ def start(self):
                                 else:
                                     pass
 
-                if re.search(r"\bhora\b", user_input.lower()):
+                elif re.search(r"\bhora\b", user_input.lower()):
                     now = datetime.now()
                     response = f"Son las {now.strftime('%H:%M:%S')}"
                     speak(response)
+                    speak("¿Necesitas algo más?")
+                    user_input = transcribe_audio_to_text()
+                    if any(palabra in user_input.lower() for palabra in palabras_afirmation):
+                        speak("¿Qué más necesitas?")
+                    elif any(palabra in user_input.lower() for palabra in palabras_cancelation):
+                        stop(self)
+                    else:
+                        hora_finished = False
+                        while not hora_finished:
+                            speak("¿No te entendí, ¿Necesitas algo más?")
+                            user_input = transcribe_audio_to_text()
+                            if any(palabra in user_input.lower() for palabra in palabras_afirmation):
+                                hora_finished = True
+                            elif any(palabra in user_input.lower() for palabra in palabras_cancelation):
+                                hora_finished = True
+                                stop(self)
+                            else:
+                                pass
 
                 elif any(form in user_input.lower() for form in ["hola", "buenos días", "buenas tardes", "buenas noches", "buenas"]):
                     response = "¡Hola! ¿Cómo podría ayudarte?"
@@ -671,7 +740,6 @@ def start(self):
                 else:
                     response = "Lo siento, no entendí eso. ¿Puedes intentar de nuevo?"
                     speak(response)
-            time.sleep(0.1)
         except Exception as e:
             print(f"Error: {e}")
             speak("Hubo un problema al procesar el audio, por favor intenta de nuevo.")
