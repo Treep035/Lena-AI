@@ -88,7 +88,7 @@ def change_password(event, parent):
             status_label_invalid.hide()
             main_content_layout.addWidget(status_label_invalid)
             status_label_invalid.show()
-            status_label_invalid.setText("<a href='#' style='color: #C53B3D ; font-size: 15px; font-weight: bold; text-decoration: none;'>La contraseña nueva debe tener...</a>")
+            status_label_invalid.setText("<a href='#' style='color: #C53B3D ; font-size: 15px; font-weight: bold; text-decoration: none;'>Contraseña inválida</a>")
             status_label_invalid.setAlignment(Qt.AlignCenter)
 
         if same_password:
@@ -96,7 +96,7 @@ def change_password(event, parent):
             status_label_invalid.hide()
             main_content_layout.addWidget(status_label_invalid)
             status_label_invalid.show()
-            status_label_invalid.setText("<a href='#' style='color: #C53B3D ; font-size: 15px; font-weight: bold; text-decoration: none;'>La contraseña nueva no puede ser la misma que la actual</a>")
+            status_label_invalid.setText("<a href='#' style='color: #C53B3D ; font-size: 15px; font-weight: bold; text-decoration: none;'>La nueva contraseña debe ser diferente</a>")
             status_label_invalid.setAlignment(Qt.AlignCenter)
 
         if not no_fields and not not_actual_password and not invalid_fields and not invalid_regex and not same_password:

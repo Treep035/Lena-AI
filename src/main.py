@@ -43,6 +43,7 @@ class MainWindow(QMainWindow):
         # Conectar las señales
         self.login_widget.switch_to_register.connect(self.show_register)
         self.register_widget.switch_to_login.connect(self.show_login)
+        self.register_widget.switch_to_home.connect(self.show_home)
         self.login_widget.switch_to_home.connect(self.show_home)
 
         logged_in = check_auth_token_controller()

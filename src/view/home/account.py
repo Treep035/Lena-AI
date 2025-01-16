@@ -90,7 +90,7 @@ class Account(QMainWindow):
         self.profile_pic_label.setFixedSize(150, 150)  # Tamaño fijo para la imagen
         self.main_content_layout.addWidget(self.profile_pic_label, alignment=Qt.AlignCenter)
 
-        user_image_path = account_picture_load_controller()
+        user_image_path = account_picture_load_controller(theme_color)
         pixmap = QPixmap(user_image_path)
         size = 150
         pixmap = pixmap.scaled(size, size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
@@ -127,11 +127,15 @@ class Account(QMainWindow):
         self.username_label.setText(username)
 
     def update_profile_picture(self):
+
+        theme = get_theme_controller()
+        theme_color = change_theme(self, theme)
+        
         profile_pic_label_updated = QLabel()
         profile_pic_label_updated.setAlignment(Qt.AlignCenter)
         profile_pic_label_updated.setFixedSize(150, 150)  # Tamaño fijo para la imagen
 
-        user_image_path = account_picture_load_controller()
+        user_image_path = account_picture_load_controller(theme_color)
         pixmap = QPixmap(user_image_path)
         size = 150
         pixmap = pixmap.scaled(size, size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
@@ -173,6 +177,35 @@ class Account(QMainWindow):
         theme = get_theme_controller()
         theme_color = change_theme(self, theme)
         self.central_widget.setStyleSheet(f"background-color: {theme_color[1]};")
+
+        profile_pic_label_updated = QLabel()
+        profile_pic_label_updated.setAlignment(Qt.AlignCenter)
+        profile_pic_label_updated.setFixedSize(150, 150)  # Tamaño fijo para la imagen
+
+        user_image_path = account_picture_load_controller(theme_color)
+        pixmap = QPixmap(user_image_path)
+        size = 150
+        pixmap = pixmap.scaled(size, size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+
+        circular_pixmap = QPixmap(size, size)
+        circular_pixmap.fill(Qt.transparent)  # Fondo transparente
+
+        # Pintar la imagen en un círculo
+        painter = QPainter(circular_pixmap)
+        painter.setRenderHint(QPainter.Antialiasing)
+        path = QPainterPath()
+        path.addEllipse(0, 0, size, size)
+        painter.setClipPath(path)
+        painter.drawPixmap(0, 0, pixmap)
+        painter.end()
+
+        # Establecer el pixmap circular en la QLabel
+        profile_pic_label_updated.setPixmap(circular_pixmap)
+
+        self.layout.replaceWidget(self.profile_pic_label, profile_pic_label_updated)
+        self.profile_pic_label.deleteLater()
+
+        self.profile_pic_label = profile_pic_label_updated
 
         self.configuration_button.deleteLater()
         self.configuration_button = QPushButton(self)

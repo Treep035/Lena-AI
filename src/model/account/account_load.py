@@ -6,9 +6,9 @@ from PIL import Image
 
 from model.token.auth_token import get_auth_token_from_request
 
-def account_picture_load():
+def account_picture_load(theme_color):
         # Ruta predeterminada para la imagen
-        default_image_path = os.path.join(os.path.dirname(__file__), "..", "..", "resources", "images", "profile", "white", "profile.png")
+        default_image_path = os.path.join(os.path.dirname(__file__), "..", "..", "resources", "images", theme_color[4], "profile", "profile.png")
         user_image_path = default_image_path
 
         # Conexión a la base de datos

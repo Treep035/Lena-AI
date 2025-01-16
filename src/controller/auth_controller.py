@@ -35,9 +35,9 @@ def validate_fields_login_controller(self):
     no_fields, invalid_fields, logged_in, id_user = validate_fields_login(self)
     return no_fields, invalid_fields, logged_in, id_user
     
-
 def validate_fields_register_controller(self):
-    validate_fields_register(self)
+    no_fields, name_in_use, invalid_regex_email, email_in_use, invalid_regex_password, invalid_data_birthdate, logged_in, id_user = validate_fields_register(self)
+    return no_fields, name_in_use, invalid_regex_email, email_in_use, invalid_regex_password, invalid_data_birthdate, logged_in, id_user
 
 def validate_fields_change_password_controller(self):
     no_fields, not_actual_password, invalid_fields, invalid_regex, same_password = validate_fields_change_password(self)

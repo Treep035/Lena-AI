@@ -215,7 +215,7 @@ class Chat(QMainWindow):
 
         username = account_username_load_controller()
 
-        user_image_path = account_picture_load_controller()
+        user_image_path = account_picture_load_controller(theme_color)
         pixmap = QPixmap(user_image_path)
         size = 52
         pixmap = pixmap.scaled(size, size, Qt.KeepAspectRatio, Qt.SmoothTransformation)

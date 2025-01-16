@@ -14,26 +14,87 @@ def validate_fields_register(self):
     email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     password_regex = r'^(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{8,}$'
 
-    # Verifica que los campos no estén vacíos
+    no_fields = False
+    name_in_use = False
+    invalid_regex_email = False
+    email_in_use = False
+    invalid_regex_password = False
+    invalid_data_birthdate = False
+    logged_in = False
+    id_user = None
+
+    connection = None
+    cursor = None
+
+    # Verifica que los campos no estén vacíos 
+    # no_fields, name_in_use, invalid_regex_email, email_in_use, invalid_regex_password, invalid_data_birthdate, logged_in, id_user
     if not username or not email or not password:
-        QMessageBox.warning(self, "Lena AI", "Please fill in all fields.")
-        return
+        no_fields = True
+        return no_fields, name_in_use, invalid_regex_email, email_in_use, invalid_regex_password, invalid_data_birthdate, logged_in, id_user
     
+    try:
+        connection = connect_to_db()  # Llama a la función de conexión
+        if connection:
+            cursor = connection.cursor()
+            
+            # Consulta para obtener el password hasheado de la base de datos
+            cursor.execute(f"SELECT username FROM user")
+            result = [fila[0] for fila in cursor.fetchall()]
+
+            if result:
+                if username in result:
+                    name_in_use = True
+                    return no_fields, name_in_use, invalid_regex_email, email_in_use, invalid_regex_password, invalid_data_birthdate, logged_in, id_user
+                else:
+                    name_in_use = False
+
+    except Exception as e:
+        print(self, "Database Error", f"An error occurred: {e}")
+    finally:
+        if cursor:
+            cursor.close()
+        if connection:
+            connection.close()
+
     if not re.match(email_regex, email):
-        QMessageBox.warning(self, "Lena AI", "Email must be valid.")
-        return
+        invalid_regex_email = True
+        return no_fields, name_in_use, invalid_regex_email, email_in_use, invalid_regex_password, invalid_data_birthdate, logged_in, id_user
     
+    try:
+        connection = connect_to_db()  # Llama a la función de conexión
+        if connection:
+            cursor = connection.cursor()
+            
+            # Consulta para obtener el password hasheado de la base de datos
+            cursor.execute(f"SELECT email FROM user")
+            result = [fila[0] for fila in cursor.fetchall()]
+
+            if result:
+                if email in result:
+                    email_in_use = True
+                    return no_fields, name_in_use, invalid_regex_email, email_in_use, invalid_regex_password, invalid_data_birthdate, logged_in, id_user
+                else:
+                    email_in_use = False
+
+    except Exception as e:
+        print(self, "Database Error", f"An error occurred: {e}")
+    finally:
+        if cursor:
+            cursor.close()
+        if connection:
+            connection.close()
+
     if not re.match(password_regex, password):
-        QMessageBox.warning(self, "Lena AI", "Password must be at least 8 characters long, contain at least one uppercase letter, and at least one special character.")
-        return
+        invalid_regex_password = True
+        return no_fields, name_in_use, invalid_regex_email, email_in_use, invalid_regex_password, invalid_data_birthdate, logged_in, id_user
     
     birthdate_obj = datetime.strptime(birthdate, "%Y-%m-%d")
     today = datetime.today()
     age = today.year - birthdate_obj.year - ((today.month, today.day) < (birthdate_obj.month, birthdate_obj.day))
 
     if age < 18:
-        QMessageBox.warning(self, "Lena AI", "You must be at least 18 years old to register.")
-        return
+        invalid_data_birthdate = True
+        return no_fields, name_in_use, invalid_regex_email, email_in_use, invalid_regex_password, invalid_data_birthdate, logged_in, id_user
     
     hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
         
@@ -51,15 +112,18 @@ def validate_fields_register(self):
             query = "INSERT INTO user (username, email, password, birthdate, theme_mode, language) VALUES (%s, %s, %s, %s, %s, %s)"
             cursor.execute(query, (username, email, hashed_password, birthdate, theme_mode, language))
             connection.commit()
+
+            query = "SELECT id_user FROM user WHERE email = %s"
+            cursor.execute(query, (email,))
             
-        QMessageBox.information(self, "Success", "Registration successful!")
+            id_user = cursor.fetchone()[0]
+        
+        logged_in = True
+        return no_fields, name_in_use, invalid_regex_email, email_in_use, invalid_regex_password, invalid_data_birthdate, logged_in, id_user
     except Exception as e:
-        QMessageBox.critical(self, "Database Error", f"An error occurred: {e}")
+        print(self, "Database Error", f"An error occurred: {e}")
     finally:
         if cursor:
             cursor.close()
         if connection:
             connection.close()
-
-    # Si todo es válido
-    QMessageBox.information(self, "Success", "All fields are valid!")

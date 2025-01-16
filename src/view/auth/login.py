@@ -163,6 +163,8 @@ class Login(QMainWindow):
     def clear_fields(self):
         self.text_email.clear()
         self.text_password.clear()
+        self.toggle_button.setChecked(False)
+        self.toggle_password_visibility()
     
     def remove_error_message(self):
         self.main_content_layout.removeWidget(self.status_label)

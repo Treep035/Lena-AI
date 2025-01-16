@@ -72,7 +72,7 @@ def change_name(event, parent):
             status_label_invalid.hide()
             main_content_layout.addWidget(status_label_invalid)
             status_label_invalid.show()
-            status_label_invalid.setText("<a href='#' style='color: #C53B3D ; font-size: 15px; font-weight: bold; text-decoration: none;'>El nuevo nombre no puede ser el mismo que el actual</a>")
+            status_label_invalid.setText("<a href='#' style='color: #C53B3D ; font-size: 15px; font-weight: bold; text-decoration: none;'>El nuevo nombre debe ser diferente</a>")
             status_label_invalid.setAlignment(Qt.AlignCenter)
 
         if not no_fields and not not_actual_name and not invalid_fields and not name_in_use and not same_name:
