@@ -188,16 +188,20 @@ def start(self):
             if user_input:
                 response = ""
 
-                if any(form in user_input.lower() for form in ["reproduce", "reproducir", "reproduceme" "musica", "musica de", "cancion", "cancion de", "canciones", "canciones de", "escuchar", "pon", "ponme"]):
+                if any(form in user_input.lower() for form in ["reproduce", "reproducir", "reprodúceme", "música", "músicas", "canción",
+                                                                "canciones", "escuchar", "pon", "ponme", "poner"]):
                     reproduce_finished = False
                     while not reproduce_finished:
-                        match = re.search(r"(reproduce|musica(?: de)?|cancion(?: de)?|canciones(?: de)?|escuchar|pon(?:me)?)\s+(.*)", user_input.lower())
+                        match = re.search(r"(reprodúceme(?: la)?|reproduce(?: la)?|reproducir(?: la)?|poner(?: la)?|músicas(?: de)?|música(?: de)?|canciones(?: de)?|canción(?: de)?|escuchar(?: la)?|pon(?:me)?(?: la)?)\s+(?:canciones(?: de)?|canción(?: de)?|músicas(?: de)?|música(?: de)?\s)?(.*)", user_input.lower())
 
                         if match and match.group(2):  # Si se encuentra una coincidencia y hay palabras después de la clave
                             search_query = match.group(2).strip()  # Extraer la parte que viene después de la palabra clave
                         else:  # Si el usuario no menciona nada después de la palabra clave
                             speak("¿Qué canción o artista quieres escuchar?")
                             user_input = transcribe_audio_to_text()
+                            if any(palabra in user_input.lower() for palabra in palabras_cancelation):
+                                reproduce_finished = True
+                                stop(self)
                             search_query = user_input.lower().strip()
 
                         load_dotenv()
