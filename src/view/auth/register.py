@@ -86,8 +86,12 @@ class Register(QMainWindow):
         self.date_birthdate.setStyleSheet("""
     QDateEdit {
         color: white;
-        border-radius: 10px;
-        border: 1px solid #ccc;
+        border-radius: 10px; 
+        border-top-left-radius: 0px;
+        border-bottom-left-radius: 0px;
+        border-width: 1px 1px 1px 0px; /* Sin borde a la izquierda */
+        border-style: solid;
+        border-color: #ccc;
         padding: 3px;
         padding-left: 10px;
         background-color: #233240;  /* Fondo más oscuro */
@@ -174,8 +178,18 @@ class Register(QMainWindow):
         password_layout.addWidget(self.toggle_button)
 
         self.birthdate_label = QLabel("Birthdate...")
-        self.birthdate_label.setStyleSheet("color: #A0A0A0; border-radius: 10px; border: 1px solid #ccc; padding: 13px 3px 13px 8px;")
+        self.birthdate_label.setStyleSheet("""
+            color: #A0A0A0; 
+            border-radius: 10px; 
+            border-top-right-radius: 0px; 
+            border-bottom-right-radius: 0px; 
+            border-width: 1px 0 1px 1px; 
+            border-style: solid; 
+            border-color: #ccc; 
+            padding: 15px 3px 13px 8px;
+        """)
         self.birthdate_label.setAlignment(Qt.AlignLeft)
+        self.birthdate_label.setFixedWidth(200)      
 
         birthdate_layout_3 = QHBoxLayout()
         birthdate_layout_3.addWidget(self.birthdate_label)

@@ -11,6 +11,8 @@ import re
 import requests
 from dotenv import load_dotenv
 import random
+from googletrans import Translator, LANGUAGES
+import asyncio
 
 # Función para hablar usando gTTS
 def speak(text):
@@ -50,6 +52,33 @@ def stop(self):
     self.started = False
 
 def start(self):
+
+    respuestas_bot = {
+        ("bien", "muy bien", "excelente"): "Me alegro de que todo vaya bien.",
+        ("cómo estas", "que tal estas", "que tal", "como te encuentras"): "Estoy aquí para ayudarte. ¿En qué puedo asistirte?",
+        ("gracias", "thank you"): "¡De nada! Siempre a tu servicio.",
+        ("que haces", "azul"): "Hola, aquí esperando para ayudarte.",
+        ("que puedes hacer",): "Puedo responder preguntas, ayudarte con tareas, recomendar cosas o simplemente charlar contigo. ¡Tú dime!",
+        ("eres humano",): "No, soy una inteligencia artificial, pero puedo hacer muchas cosas para ayudarte como si fuera un asistente humano.",
+        ("tienes emociones",): "No tengo emociones como los humanos, pero estoy diseñado para responder de manera amigable y útil.",
+        ("cual es el sentido de la vida",): "Esa es una gran pregunta. Algunos dicen que es encontrar la felicidad; otros, ayudar a los demás. ¿Tú qué piensas?",
+        ("recuerdame algo mañana",): "No puedo recordar cosas automáticamente, pero te sugiero usar una aplicación de recordatorios. ¡Puedo ayudarte a configurarla si quieres!",
+        ("como estas hecho",): "Estoy hecho de líneas de código y algoritmos diseñados para entenderte y ayudarte.",
+        ("me puedes enseñar algo",): "¡Claro! ¿Qué te gustaría aprender? Puedo explicarte cosas de tecnología, idiomas, matemáticas y mucho más.",
+        ("cuentame algo interesante",): "¿Sabías que los pulpos tienen tres corazones? Dos bombean sangre a las branquias y uno al resto del cuerpo.",
+        ("estoy aburrido",): "¿Qué te parece si jugamos a algo, te cuento un dato curioso o vemos una idea para un nuevo proyecto?",
+        ("me siento triste",): "Lo siento mucho. A veces hablar con alguien o hacer algo que te guste puede ayudarte. Estoy aquí si necesitas apoyo.",
+        ("que puedo hacer para ser mas productivo",): "Intenta organizar tus tareas por prioridad, usar una técnica como Pomodoro y asegurarte de tomar descansos.",
+        ("dame un consejo",): "Nunca dejes de aprender, incluso de los errores. Cada experiencia puede ayudarte a crecer.",
+        ("que significa",): "Déjame buscarlo para darte la mejor definición.",
+        ("recomiendame algo para comer",): "¿Qué tal una pizza casera o unos tacos? ¡Siempre son una buena idea!",
+        ("te gusta",): "No tengo gustos como los humanos, pero puedo decirte por qué a la gente le encanta eso.",
+        ("que hago si me siento estresado",): "Intenta respirar profundamente, salir a caminar o escuchar música relajante.",
+        ("cuentame una historia",): "Había una vez un pequeño robot que quería aprender todo sobre los humanos.",
+        ("cual es tu color favorito",): "No tengo ojos para ver colores, pero el azul suele ser muy popular.",
+        ("puedes darme ideas para un proyecto",): "Por supuesto, ¿qué te parece un blog personal, una app sencilla o algo relacionado con tus intereses?",
+    }
+
     palabras_cancelation = [
         "adiós", "nada", "no", "cancelar", "detener", 
         "salir", "cerrar", "terminar", "finalizar", 
@@ -175,6 +204,24 @@ def start(self):
         {"pregunta": "Soy redondo y siempre estoy en el cielo, pero nunca me caigo. ¿Qué soy?", "respuesta": "El sol"}
     ]
 
+    language_keywords = {v.lower(): k for k, v in LANGUAGES.items()}  # LANGUAGES viene de googletrans
+
+    language_aliases = {
+    "inglés": "english",
+    "español": "spanish",
+    "francés": "french",
+    "alemán": "german",
+    "italiano": "italian",
+    "portugués": "portuguese",
+    "chino": "chinese",
+    "japonés": "japanese",
+    "ruso": "russian",
+}
+    
+    palabras_a_numeros = {
+    "uno": 1, "dos": 2, "tres": 3, "cuatro": 4, "cinco": 5,
+    "seis": 6, "siete": 7, "ocho": 8, "nueve": 9,
+}
 
     self._stop_event = threading.Event()
     # Hablar al inicio
@@ -331,6 +378,109 @@ def start(self):
                             if any(palabra in user_input.lower() for palabra in palabras_cancelation):
                                 open_finished = True
                                 stop(self)
+
+                # Crear un diccionario para mapear palabras clave a códigos de idioma
+
+                elif any(form in user_input.lower() for form in ["traduce"]):
+                        match = re.search(r"(traduce)\s+(.*)", user_input.lower())
+
+                        if match and match.group(2):  # Si hay un texto para traducir
+                            user_input = match.group(2).strip()
+                        else:
+                            speak("¿Qué texto quieres traducir?")
+                            user_input = transcribe_audio_to_text()
+                        translate_finished = False
+                        while not translate_finished:
+                            match = re.search(r"(traduce)\s+(.*)", user_input.lower())
+
+                            if match and match.group(2):  # Si hay un texto para traducir
+                                user_input = match.group(2).strip()
+                            else:
+                                pass
+
+                            text_to_translate = user_input.strip()
+                            # Preguntar por el idioma objetivo
+                            speak("¿A qué idioma quieres traducir?")
+                            user_input = transcribe_audio_to_text()
+                            translate_finished_2 = False
+                            while not translate_finished_2:
+                                # Normalizar y buscar idioma
+                                idioma_objetivo = None
+                                user_input = user_input.lower().strip()
+
+                                # Buscar en alias
+                                for alias, english_name in language_aliases.items():
+                                    if alias in user_input:
+                                        idioma_objetivo = english_name
+                                        break
+                                else:
+                                    idioma_objetivo = user_input  # Si no hay alias, usamos el texto original
+
+                                target_language = language_keywords.get(idioma_objetivo, None)
+
+                                def run_translation_in_thread(text_to_translate, target_language):
+                                    async def translate_text(text_to_translate, target_language):
+                                        translator = Translator()
+                                        try:
+                                            translated = await translator.translate(text_to_translate, dest=target_language)
+                                            speak(f"La traducción es: {translated.text}")
+                                            print(f"La traducción es: {translated.text}")
+                                        except Exception as e:
+                                            speak("Hubo un error al traducir. Inténtalo de nuevo.")
+                                            print(f"Error: {e}")
+
+                                    def start_translation_loop():
+                                        loop = asyncio.new_event_loop()
+                                        asyncio.set_event_loop(loop)
+
+                                        try:
+                                            loop.run_until_complete(translate_text(text_to_translate, target_language))
+                                        except Exception as e:
+                                            print(f"Error al ejecutar la tarea asíncrona: {e}")
+                                        finally:
+                                            loop.close()
+
+                                    thread = threading.Thread(target=start_translation_loop)
+                                    thread.start()
+                                    thread.join()
+                                
+                                if target_language:
+                                    run_translation_in_thread(text_to_translate, target_language)
+                                    # Preguntar si quiere traducir algo más
+                                    speak("¿Quieres traducir algo más?")
+                                    user_input = transcribe_audio_to_text()
+                                    if any(palabra in user_input.lower() for palabra in palabras_afirmation):
+                                        speak("Dime que quieres traducir.")
+                                        user_input = transcribe_audio_to_text()
+                                        translate_finished_2 = True
+                                    elif any(palabra in user_input.lower() for palabra in palabras_cancelation):
+                                        translate_finished_2 = True
+                                        translate_finished = True
+                                        stop(self)
+                                    else:
+                                        translate_finished_3 = False
+                                        while not translate_finished_3:
+                                            speak("No entendí. ¿Quieres traducir algo más?")
+                                            user_input = transcribe_audio_to_text()
+                                            if any(palabra in user_input.lower() for palabra in palabras_afirmation):
+                                                speak("Dime el texto que quieres traducir.")
+                                                user_input = transcribe_audio_to_text()
+                                                translate_finished_3 = True
+                                                translate_finished_2 = True
+                                            elif any(palabra in user_input.lower() for palabra in palabras_cancelation):
+                                                translate_finished_3 = True
+                                                translate_finished_2 = True
+                                                translate_finished = True
+                                                stop(self)
+                                            else:
+                                                pass
+                                else:
+                                    speak(f"No entendí el idioma '{idioma_objetivo}'. Vuelve a decirlo, por favor.")
+                                    user_input = transcribe_audio_to_text()
+                                    if any(palabra in user_input.lower() for palabra in palabras_cancelation):
+                                        translate_finished_2 = True
+                                        translate_finished = True
+                                        stop(self)
 
                 elif any(form in user_input.lower() for form in ["explica", "qué es", "quién es", "definición de", "definición", "definir", "qué significa"]):
                     wikipedia_finished = False
@@ -496,6 +646,69 @@ def start(self):
                             if any(palabra in user_input.lower() for palabra in palabras_cancelation):
                                 climate_finished = True
                                 stop(self)
+
+                # Código de integración con el flujo de la conversación
+                elif any(form in user_input for form in ["convertir divisa", "divisa", "divisas", "cambio de moneda", "cambio de divisas"]):
+                    match = re.search(r"(convertir divisa|divisa|divisas|cambio de moneda|cambio de divisas)\s+(.*)", user_input.lower())
+                    
+                    if match and match.group(2):  # Si hay un texto después de la palabra clave
+                        user_input = match.group(2).strip()
+                        divisa_entrada, divisa_salida = extraer_divisas(user_input)  # Llamamos a la función que extrae las divisas
+                        def extraer_divisas(user_input):
+                            divisas_posibles = ["usd", "eur", "gbp", "jpy", "mxn", "inr", "cad"]  # Agrega las divisas que soportas
+                            divisas = user_input.lower().split("a")  # Asumiendo que el formato es algo como "usd a eur"
+                            
+                            if len(divisas) == 2:
+                                divisa_entrada = divisas[0].strip()
+                                divisa_salida = divisas[1].strip()
+                                
+                                # Validamos si las divisas están en nuestra lista
+                                if divisa_entrada in divisas_posibles and divisa_salida in divisas_posibles:
+                                    return divisa_entrada, divisa_salida
+                            return None, None
+                        if divisa_entrada and divisa_salida:
+                            speak(f"Voy a convertir {divisa_entrada} a {divisa_salida}. ¿Cuál es la cantidad?")
+                            cantidad = transcribe_audio_to_text()
+                            if cantidad.isnumeric():
+                                cantidad = float(cantidad)
+                                resultado = realizar_conversion(divisa_entrada, divisa_salida, cantidad)
+                                def realizar_conversion(divisa_entrada, divisa_salida, cantidad):
+                                    tasa = obtener_tasa_de_cambio(divisa_entrada, divisa_salida)
+                                    def obtener_tasa_de_cambio(divisa_entrada, divisa_salida):
+                                        load_dotenv()
+                                        api_key_exchange = os.getenv('API_KEY_EXCHANGE')
+                                        BASE_URL = "https://v6.exchangerate-api.com/v6/{}/latest/".format(api_key_exchange)
+                                        url = BASE_URL + divisa_entrada  # URL con la divisa base
+                                        try:
+                                            response = requests.get(url)
+                                            data = response.json()
+                                            
+                                            if data['result'] == 'success':
+                                                tasa = data['conversion_rates'].get(divisa_salida)
+                                                if tasa:
+                                                    return tasa
+                                                else:
+                                                    speak("No se encontró la tasa de cambio para la divisa de salida.")
+                                                    return None
+                                            else:
+                                                speak("Hubo un problema al obtener la tasa de cambio.")
+                                                return None
+                                        except Exception as e:
+                                            speak("Hubo un error al consultar la API de tasas de cambio.")
+                                            print(f"Error: {e}")
+                                            return None
+                                    if tasa:
+                                        resultado = cantidad * tasa
+                                        return resultado
+                                    else:
+                                        return "Tasa de cambio no disponible."
+                                speak(f"{cantidad} {divisa_entrada} es igual a {resultado} {divisa_salida}.")
+                            else:
+                                speak("No entendí la cantidad. Por favor, dime un número.")
+                        else:
+                            speak("No pude identificar las divisas que deseas convertir. ¿Puedes repetirlo?")
+                    else:
+                        speak("¿Qué divisa quieres convertir?")
 
                 elif any(form in user_input for form in ["adivinanza", "adivinanzas", "acertijo", "acertijos"]):
                     try:
@@ -713,6 +926,108 @@ def start(self):
                                 else:
                                     pass
 
+                elif any(form in user_input for form in ["número oculto", "jugar número oculto", "jugar adivinar número oculto", "adivinar número oculto", "adivinar número"]):
+                    numero_oculto = random.randint(1, 100)
+                    speak("Voy a pensar en un número del 1 al 100. Adivina cuál es.")
+                    intentos = 0
+                    numero_oculto_finished = False
+                    while not numero_oculto_finished:
+                        while intentos <= 9:
+                            if intentos < 9:
+                                speak(f"Te quedan {10 - intentos} intentos.")
+                            else:
+                                speak(f"Te queda un intento.")
+                            user_input = transcribe_audio_to_text()
+                            def convertir_a_numero(user_input):
+                                if user_input.isnumeric():
+                                    return int(user_input)
+                                elif user_input.lower() in palabras_a_numeros:
+                                    return palabras_a_numeros[user_input.lower()]
+                                else:
+                                    return None
+                            numero = convertir_a_numero(user_input)
+                            if numero is not None:
+                                if numero == numero_oculto:
+                                    speak("¡Correcto! ¡Has adivinado el número!")
+                                    numero_oculto_finished_2 = False
+                                    while not numero_oculto_finished_2:
+                                        speak("¿Quieres jugar otra vez?")
+                                        user_input = transcribe_audio_to_text()
+                                        if any(palabra in user_input.lower() for palabra in palabras_afirmation):
+                                            numero_oculto = random.randint(1, 100)
+                                            speak("Voy a pensar en un número del 1 al 100. Adivina cuál es.")
+                                            intentos = 0
+                                            numero_oculto_finished_2 = True
+                                        elif any(palabra in user_input.lower() for palabra in palabras_cancelation):
+                                            numero_oculto_finished_2 = True
+                                            numero_oculto_finished = True
+                                            stop(self)
+                                        else:
+                                            numero_oculto_finished_3 = False
+                                            while not numero_oculto_finished_3:
+                                                speak("¿No te entendí, ¿quieres jugar otra vez?")
+                                                user_input = transcribe_audio_to_text()
+                                                if any(palabra in user_input.lower() for palabra in palabras_afirmation):
+                                                    numero_oculto = random.randint(1, 100)
+                                                    speak("Voy a pensar en un número del 1 al 100. Adivina cuál es.")
+                                                    intentos = 0
+                                                    numero_oculto_finished_3 = True
+                                                    numero_oculto_finished_2 = True
+                                                elif any(palabra in user_input.lower() for palabra in palabras_cancelation):
+                                                    numero_oculto_finished_3 = True
+                                                    numero_oculto_finished_2 = True
+                                                    numero_oculto_finished = True
+                                                    stop(self)
+                                                else:
+                                                    pass
+                                elif numero < 1 or numero > 100:
+                                    speak("El número debe estar entre 1 y 100.")
+                                elif numero < numero_oculto:
+                                    speak(f"El número es mayor que {numero}.")
+                                    intentos += 1
+                                else:
+                                    speak(f"El número es menor que {numero}.")
+                                    intentos += 1
+                            elif any(palabra in user_input.lower() for palabra in palabras_cancelation):
+                                intentos = 11
+                                numero_oculto_finished = True
+                                stop(self)
+                            else:
+                                speak("No entendí. ¿Qué número crees que es?")
+                        if intentos == 10:
+                            speak(f"Lo siento, no has adivinado el número. El número era {numero_oculto}.")
+                            numero_oculto_finished_4 = False
+                            while not numero_oculto_finished_4:
+                                speak("¿Quieres jugar otra vez?")
+                                user_input = transcribe_audio_to_text()
+                                if any(palabra in user_input.lower() for palabra in palabras_afirmation):
+                                    numero_oculto = random.randint(1, 100)
+                                    speak("Voy a pensar en un número del 1 al 100. Adivina cuál es.")
+                                    intentos = 0
+                                    numero_oculto_finished_4 = True
+                                elif any(palabra in user_input.lower() for palabra in palabras_cancelation):
+                                    numero_oculto_finished_4 = True
+                                    numero_oculto_finished = True
+                                    stop(self)
+                                else:
+                                    numero_oculto_finished_5 = False
+                                    while not numero_oculto_finished_5:
+                                        speak("¿No te entendí, ¿quieres jugar otra vez?")
+                                        user_input = transcribe_audio_to_text()
+                                        if any(palabra in user_input.lower() for palabra in palabras_afirmation):
+                                            numero_oculto = random.randint(1, 100)
+                                            speak("Voy a pensar en un número del 1 al 100. Adivina cuál es.")
+                                            intentos = 0
+                                            numero_oculto_finished_5 = True
+                                            numero_oculto_finished_4 = True
+                                        elif any(palabra in user_input.lower() for palabra in palabras_cancelation):
+                                            numero_oculto_finished_5 = True
+                                            numero_oculto_finished_4 = True
+                                            numero_oculto_finished = True
+                                            stop(self)
+                                        else:
+                                            pass
+
                 elif re.search(r'\d+(\.\d+)?\s*[-+*/]\s*\d+(\.\d+)?', user_input):
                     math_finished = False
                     while not math_finished:                        
@@ -793,6 +1108,12 @@ def start(self):
                 elif any(form in user_input.lower() for form in ["hola", "buenos días", "buenas tardes", "buenas noches", "buenas"]):
                     response = "¡Hola! ¿Cómo podría ayudarte?"
                     speak(response)
+
+                elif any(user_input.lower().strip() == frase for frases in respuestas_bot.keys() for frase in frases):
+                    for frases, respuesta in respuestas_bot.items():
+                        if user_input.lower().strip() in frases:
+                            speak(respuesta)
+                            break
 
                 elif any(palabra in user_input.lower() for palabra in palabras_cancelation):
                     if "adiós" in user_input.lower():
