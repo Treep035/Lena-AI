@@ -4,6 +4,8 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 
 from controller.auth_token_controller import check_auth_token_controller
+from controller.auth_token_controller import check_refresh_token_controller
+from controller.handle_lenaai_url_controller import handle_lenaai_url_controller
 
 from view.shared.titlebar import TitleBar
 from view.shared.titlebar_dialog import TitleBarDialog
@@ -19,6 +21,7 @@ from view.home.configuration import Configuration
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+
         self.setWindowIcon(QIcon("src/resources/images/lenaicon.ico"))
         self.setWindowTitle("Lena AI")
         self.setGeometry(100, 100, 450, 725)
@@ -51,7 +54,11 @@ class MainWindow(QMainWindow):
         if logged_in:
             self.show_home()
         else:
-            self.show_login()
+            logged_in = check_refresh_token_controller()
+            if logged_in:
+                self.show_home()
+            else:
+                self.show_login()
 
     def show_register(self):
         self.layout.removeWidget(self.login_widget)
@@ -157,6 +164,10 @@ class MainWindow(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+
+    # Crea y muestra la ventana principal después de manejar la URL
     window = MainWindow()
     window.show()
+
+    # Ejecuta la aplicación y espera su cierre
     sys.exit(app.exec_())

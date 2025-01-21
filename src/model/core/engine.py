@@ -12,6 +12,7 @@ import requests
 from dotenv import load_dotenv
 import random
 from googletrans import Translator, LANGUAGES
+from controller.stop_animation_controller import StopAnimationSignal
 import asyncio
 
 # Función para hablar usando gTTS
@@ -49,7 +50,6 @@ def transcribe_audio_to_text():
 
 def stop(self):
     self._stop_event.set()
-    self.started = False
 
 def start(self):
 
@@ -229,7 +229,9 @@ def start(self):
         speak("Hola, estoy lista para atenderte. Pregúntame lo que necesites.")
     else:
         speak("¿En qué puedo ayudarte ahora?")
+    print("Hilo iniciado.")
     while not self._stop_event.is_set():
+        print("Hilo trabajando...")
         try:
             user_input = transcribe_audio_to_text()
             if user_input:
@@ -1127,3 +1129,7 @@ def start(self):
         except Exception as e:
             print(f"Error: {e}")
             speak("Hubo un problema al procesar el audio, por favor intenta de nuevo.")
+    print("Hilo finalizando...")
+    self.started = False
+    StopAnimationSignal_Class = StopAnimationSignal.get_instance()
+    StopAnimationSignal_Class.stop_animation_signal.emit()

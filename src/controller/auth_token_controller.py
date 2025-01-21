@@ -2,9 +2,14 @@ import json
 import os
 
 from model.token.auth_token import check_auth_token, generate_tokens, insert_tokens
+from model.token.refresh_token import check_refresh_token
 
 def check_auth_token_controller():
     logged_in = check_auth_token()
+    return logged_in
+
+def check_refresh_token_controller():
+    logged_in = check_refresh_token()
     return logged_in
 
 def generate_tokens_controller():

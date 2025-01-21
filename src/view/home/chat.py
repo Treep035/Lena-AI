@@ -19,6 +19,7 @@ from PyQt5.QtCore import Qt, QEvent, QDate, pyqtSignal, QSize, QTimer, QBuffer, 
 import base64
 from io import BytesIO
 from controller.theme_controller import get_theme_controller
+from controller.save_message_controller import save_message_controller
 from resources.styles.theme import change_theme
 from view.home.configuration import Configuration
 
@@ -252,11 +253,13 @@ class Chat(QMainWindow):
     <strong>{username}</strong>
     <img src='data:image/png;base64,{img_base64}' alt='Foto de Lena' style='width: 30px; height: 30px; vertical-align: middle; margin-left: 10px;'>
 </div>
-<div style="margin-right: 75px; text-align: left; padding: 10px 15px; border-radius: 10px; margin-bottom: 20px; background-color: {theme_color[0]}; display: inline-block; max-width: 80%; word-wrap: break-word; overflow-wrap: break-word; white-space: pre-wrap;">
-    <span style="display: block; margin-left: 0;">{original_message}</span>
+<div style="margin-right: 105px; margin-left: 95px;
+            margin-bottom: 20px; word-wrap: break-word;
+            width: auto; display: inline-block;
+            direction: rtl; text-align: right;">
+<span>{original_message}</span>
 </div>
 """
-            
             current_content = self.chat_display.toHtml()
             self.chat_display.setHtml(current_content + user_message)
             self.chat_display.moveCursor(QTextCursor.End)
@@ -264,7 +267,9 @@ class Chat(QMainWindow):
 
             self.message_input.clear()
 
-            QTimer.singleShot(100, lambda: self.show_bot_response(message))
+            save_message_controller(original_message)
+
+            self.show_bot_response(message)
 
     def show_bot_response(self, message):
         theme = get_theme_controller()
@@ -277,7 +282,7 @@ class Chat(QMainWindow):
     <img src='src/resources/images/lenachat.png' alt='Foto de Lena' style='width: 30px; height: 30px; vertical-align: middle; margin-right: 10px;'>
     <strong>Lena</strong>
 </div>
-<div style='margin-left: 80px; margin-right: 80px; text-align: left; padding: 10px 15px; border-radius: 10px; margin-bottom: 20px;'>
+<div style='margin-left: 90px; margin-right: 80px; text-align: left; padding: 10px 15px; border-radius: 10px; margin-bottom: 20px;'>
 {bot_response}
 </div>
 """
