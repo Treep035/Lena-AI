@@ -28,7 +28,7 @@ from model.auth.validate_fields_login import validate_fields_login
 from model.auth.validate_fields_register import validate_fields_register
 from model.auth.validate_fields_change_password import validate_fields_change_password
 from model.auth.validate_fields_change_name import validate_fields_change_name
-# from model.auth.validate_fields_change_name import validate_fields_change_name
+from model.auth.validate_fields_recover_password import validate_fields_recover_password
 
 # Función validar los campos del login
 def validate_fields_login_controller(self):
@@ -46,3 +46,7 @@ def validate_fields_change_password_controller(self):
 def validate_fields_change_name_controller(self):
     no_fields, not_actual_name, invalid_fields, name_in_use, same_name = validate_fields_change_name(self)
     return no_fields, not_actual_name, invalid_fields, name_in_use, same_name
+
+def validate_fields_recover_password_controller(self):
+    no_fields, invalid_token, invalid_fields, invalid_regex, same_password = validate_fields_recover_password(self)
+    return no_fields, invalid_token, invalid_fields, invalid_regex, same_password

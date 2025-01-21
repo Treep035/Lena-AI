@@ -9,4 +9,4 @@ Windows Registry Editor Version 5.00
 [HKEY_CLASSES_ROOT\lenaai\shell\open]
 
 [HKEY_CLASSES_ROOT\lenaai\shell\open\command]
-@="\"C:\\Users\\treep\\OneDrive\\Escritorio\\MP13\\Lena AI\\scripts\\start_lenaai.bat\" \"%1\""
+@="wscript.exe \"C:\\Users\\treep\\OneDrive\\Escritorio\\MP13\\Lena AI\\scripts\\start_lenaaivbs.vbs\" \"%1\""

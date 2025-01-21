@@ -1,4 +1,5 @@
 import sys
+import os
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -24,6 +25,7 @@ from PyQt5.QtCore import Qt, QEvent, QDate, QSize, QTimer, QCoreApplication
 from PyQt5.QtGui import QIcon
 
 from view.shared.titlebar_dialog import TitleBarDialog
+from controller.auth_controller import validate_fields_recover_password_controller
 # from controller.recover_password_controller import send_recovery_email_controller
 from controller.theme_controller import get_theme_controller
 # from controller.auth_controller import validate_fields_change_password_controller
@@ -38,89 +40,103 @@ class NewPassword(QDialog):
         hola = "hola"
         theme_color = change_theme(hola, theme)
 
-        def toggle_password_visibility(theme_color):
-            if toggle_button.isChecked():
-                text_actual_password.setEchoMode(QLineEdit.Normal)
-                toggle_button.setIcon(QIcon(f"src/resources/images/{theme_color[4]}/password/hidepassword.png"))
-            else:
-                text_actual_password.setEchoMode(QLineEdit.Password)
-                toggle_button.setIcon(QIcon(f"src/resources/images/{theme_color[4]}/password/showpassword.png"))
-
         def toggle_password_visibility_2(theme_color):
             if toggle_button_2.isChecked():
-                text_new_password.setEchoMode(QLineEdit.Normal)
-                toggle_button_2.setIcon(QIcon(f"src/resources/images/{theme_color[4]}/password/hidepassword.png"))
+                self.text_new_password.setEchoMode(QLineEdit.Normal)
+                base_path = os.path.dirname(os.path.abspath(__file__))
+                base_path_up = os.path.abspath(os.path.join(base_path, "../.."))
+                icon_path = os.path.join(base_path_up, "resources", "images", theme_color[4], "password", "hidepassword.png")
+                toggle_button_2.setIcon(QIcon(icon_path))
             else:
-                text_new_password.setEchoMode(QLineEdit.Password)
-                toggle_button_2.setIcon(QIcon(f"src/resources/images/{theme_color[4]}/password/showpassword.png"))
+                self.text_new_password.setEchoMode(QLineEdit.Password)
+                base_path = os.path.dirname(os.path.abspath(__file__))
+                base_path_up = os.path.abspath(os.path.join(base_path, "../.."))
+                icon_path = os.path.join(base_path_up, "resources", "images", theme_color[4], "password", "showpassword.png")
+                toggle_button_2.setIcon(QIcon(icon_path))
 
         def toggle_password_visibility_3(theme_color):
             if toggle_button_3.isChecked():
-                text_confirm_new_password.setEchoMode(QLineEdit.Normal)
-                toggle_button_3.setIcon(QIcon(f"src/resources/images/{theme_color[4]}/password/hidepassword.png"))
+                self.text_confirm_new_password.setEchoMode(QLineEdit.Normal)
+                base_path = os.path.dirname(os.path.abspath(__file__))
+                base_path_up = os.path.abspath(os.path.join(base_path, "../.."))
+                icon_path = os.path.join(base_path_up, "resources", "images", theme_color[4], "password", "hidepassword.png")
+                toggle_button_3.setIcon(QIcon(icon_path))
             else:
-                text_confirm_new_password.setEchoMode(QLineEdit.Password)
-                toggle_button_3.setIcon(QIcon(f"src/resources/images/{theme_color[4]}/password/showpassword.png"))
+                self.text_confirm_new_password.setEchoMode(QLineEdit.Password)
+                base_path = os.path.dirname(os.path.abspath(__file__))
+                base_path_up = os.path.abspath(os.path.join(base_path, "../.."))
+                icon_path = os.path.join(base_path_up, "resources", "images", theme_color[4], "password", "showpassword.png")
+                toggle_button_3.setIcon(QIcon(icon_path))
 
-        # def on_save_changes_button_click():
-        #     no_fields, not_actual_password, invalid_fields, invalid_regex, same_password = validate_fields_change_password_controller(parent)
-        #     if no_fields:
-        #         main_content_layout.removeWidget(status_label_invalid)
-        #         status_label_invalid.hide()
-        #         main_content_layout.addWidget(status_label)
-        #         status_label.show()
-        #         status_label.setText("<a href='#' style='color: #C53B3D ; font-size: 15px; font-weight: bold; text-decoration: none;'>Por favor, completa todos los campos</a>")
-        #         status_label.setAlignment(Qt.AlignCenter)
-            
-        #     if not_actual_password:
-        #         main_content_layout.removeWidget(status_label_invalid)
-        #         status_label_invalid.hide()
-        #         main_content_layout.addWidget(status_label_invalid)
-        #         status_label_invalid.show()
-        #         status_label_invalid.setText("<a href='#' style='color: #C53B3D ; font-size: 15px; font-weight: bold; text-decoration: none;'>La contraseña actual es incorrecta</a>")
-        #         status_label_invalid.setAlignment(Qt.AlignCenter)
+        def on_save_changes_button_click():
+            no_fields, invalid_token, invalid_fields, invalid_regex, same_password = validate_fields_recover_password_controller(self)
 
-        #     if invalid_fields:
-        #         main_content_layout.removeWidget(status_label_invalid)
-        #         status_label_invalid.hide()
-        #         main_content_layout.addWidget(status_label_invalid)
-        #         status_label_invalid.show()
-        #         status_label_invalid.setText("<a href='#' style='color: #C53B3D ; font-size: 15px; font-weight: bold; text-decoration: none;'>Las dos contraseñas no coinciden</a>")
-        #         status_label_invalid.setAlignment(Qt.AlignCenter)
+            if no_fields:
+                main_content_layout.removeWidget(status_label_invalid)
+                status_label_invalid.hide()
+                main_content_layout.addWidget(status_label)
+                status_label.show()
+                status_label.setText("<a href='#' style='color: #C53B3D ; font-size: 15px; font-weight: bold; text-decoration: none;'>Please fill in all fields</a>")
+                status_label.setAlignment(Qt.AlignCenter)
 
-        #     if invalid_regex:
-        #         main_content_layout.removeWidget(status_label_invalid)
-        #         status_label_invalid.hide()
-        #         main_content_layout.addWidget(status_label_invalid)
-        #         status_label_invalid.show()
-        #         status_label_invalid.setText("<a href='#' style='color: #C53B3D ; font-size: 15px; font-weight: bold; text-decoration: none;'>Contraseña inválida</a>")
-        #         status_label_invalid.setAlignment(Qt.AlignCenter)
+            if invalid_token:
+                main_content_layout.removeWidget(status_label_invalid)
+                status_label_invalid.hide()
+                main_content_layout.addWidget(status_label_invalid)
+                status_label_invalid.show()
+                status_label_invalid.setText("<a href='#' style='color: #C53B3D ; font-size: 15px; font-weight: bold; text-decoration: none;'>Invalid token</a>")
+                status_label_invalid.setAlignment(Qt.AlignCenter)
 
-        #     if same_password:
-        #         main_content_layout.removeWidget(status_label_invalid)
-        #         status_label_invalid.hide()
-        #         main_content_layout.addWidget(status_label_invalid)
-        #         status_label_invalid.show()
-        #         status_label_invalid.setText("<a href='#' style='color: #C53B3D ; font-size: 15px; font-weight: bold; text-decoration: none;'>La nueva contraseña debe ser diferente</a>")
-        #         status_label_invalid.setAlignment(Qt.AlignCenter)
+            if invalid_fields:
+                main_content_layout.removeWidget(status_label_invalid)
+                status_label_invalid.hide()
+                main_content_layout.addWidget(status_label_invalid)
+                status_label_invalid.show()
+                status_label_invalid.setText("<a href='#' style='color: #C53B3D ; font-size: 15px; font-weight: bold; text-decoration: none;'>The two passwords do not match</a>")
+                status_label_invalid.setAlignment(Qt.AlignCenter)
 
-        #     if not no_fields and not not_actual_password and not invalid_fields and not invalid_regex and not same_password:
-        #         main_content_layout.removeWidget(status_label_invalid)
-        #         status_label_invalid.hide()
-        #         main_content_layout.addWidget(status_label)
-        #         status_label.show()
-        #         status_label.setText("<a href='#' style='color: #0e7101; font-size: 15px; font-weight: bold; text-decoration: none;'>Contraseña cambiada con éxito</a>")
-        #         status_label.setAlignment(Qt.AlignCenter)
-        #         QTimer.singleShot(3000, dialog.close)
+            if invalid_regex:
+                main_content_layout.removeWidget(status_label_invalid)
+                status_label_invalid.hide()
+                main_content_layout.addWidget(status_label_invalid)
+                status_label_invalid.show()
+                status_label_invalid.setText("<a href='#' style='color: #C53B3D ; font-size: 15px; font-weight: bold; text-decoration: none;'>Invalid password</a>")
+                status_label_invalid.setAlignment(Qt.AlignCenter)
+
+            if same_password:
+                main_content_layout.removeWidget(status_label_invalid)
+                status_label_invalid.hide()
+                main_content_layout.addWidget(status_label_invalid)
+                status_label_invalid.show()
+                status_label_invalid.setText("<a href='#' style='color: #C53B3D ; font-size: 15px; font-weight: bold; text-decoration: none;'>The new password must be different</a>")
+                status_label_invalid.setAlignment(Qt.AlignCenter)
+
+            if not no_fields and not invalid_token and not invalid_fields and not invalid_regex and not same_password:
+                main_content_layout.removeWidget(status_label_invalid)
+                status_label_invalid.hide()
+                main_content_layout.addWidget(status_label)
+                status_label.show()
+                status_label.setText("<a href='#' style='color: #1db00a; font-size: 15px; font-weight: bold; text-decoration: none;'>Password successfully changed</a>")
+                status_label.setAlignment(Qt.AlignCenter)
+                QTimer.singleShot(3000, lambda: (self.close(), QApplication.quit(),))
 
         def remove_error_message(self):
             main_content_layout.removeWidget(status_label)
             status_label.hide()
 
+        base_path = os.path.dirname(os.path.abspath(__file__))
+        base_path_up = os.path.abspath(os.path.join(base_path, "../.."))
+        icon_path = os.path.join(base_path_up, "resources", "images", "lenaicon.ico")
+
         dialog = QDialog()
-        dialog.setFixedSize(350, 350)
-        dialog.setWindowFlags(Qt.FramelessWindowHint | Qt.Popup)
+        dialog.setWindowIcon(QIcon(icon_path))
+        dialog.setWindowTitle("Lena AI - Recover Password")
+        dialog.setFixedSize(350, 300)
+        dialog.setWindowFlags(Qt.FramelessWindowHint | Qt.Window)
         dialog.setStyleSheet(f"background-color: {theme_color[2]};")
+
+        base_path = os.path.dirname(os.path.abspath(__file__))
+        base_path_up = os.path.abspath(os.path.join(base_path, "../.."))
 
         layout = QVBoxLayout(dialog)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -131,7 +147,7 @@ class NewPassword(QDialog):
         main_content_layout = QVBoxLayout()
         main_content_layout.setContentsMargins(15, 10, 15, 30)
 
-        label = QLabel("Cambiar contraseña")
+        label = QLabel("New password")
         label.setAlignment(Qt.AlignCenter)
         label.setStyleSheet(f"color: {theme_color[4]}; font-size: 20px; font-weight: 488; padding-bottom: 5px;")
 
@@ -139,68 +155,49 @@ class NewPassword(QDialog):
         input_layout = QVBoxLayout()
         input_layout.setContentsMargins(0, 0, 0, 0)
 
-        text_actual_password = QLineEdit()
-        text_actual_password.setPlaceholderText("Contraseña actual...")
-        text_actual_password.setStyleSheet(f"color: {theme_color[4]}; border-radius: 10px; border: 1px solid #ccc; padding: 3px; padding-left: 10px; padding-right: 45px; background-color: {theme_color[1]};")
-        text_actual_password.setEchoMode(QLineEdit.Password)
-        text_actual_password.setFixedSize(320, 50)
-        # parent.text_actual_password.textChanged.connect(remove_error_message)
-        # text_actual_password.textChanged.connect(remove_error_message)
-
-        toggle_button = QPushButton()
-        toggle_button.setIcon(QIcon(f"src/resources/images/{theme_color[4]}/password/showpassword.png"))  # Cambia "path/to/eye_icon.png" a la ruta de tu icono de ojo self
-        toggle_button.setCheckable(True)
-        toggle_button.setStyleSheet("background: transparent; border: none; padding-right: 15px; padding-top: 3px;")
-        toggle_button.setCursor(Qt.PointingHandCursor)
-        toggle_button.clicked.connect(lambda: toggle_password_visibility(theme_color))
-
         passwords_layout = QVBoxLayout()
         passwords_layout.setContentsMargins(0, 0, 0, 0)
 
-        password_layout = QHBoxLayout()
-        password_layout.setContentsMargins(0, 0, 0, 0)
-        password_layout.addWidget(text_actual_password)
-        password_layout.addWidget(toggle_button)
-
-        text_new_password = QLineEdit()
-        text_new_password.setPlaceholderText("Nueva contraseña...")
-        text_new_password.setStyleSheet(f"color: {theme_color[4]}; border-radius: 10px; border: 1px solid #ccc; padding: 3px; padding-left: 10px; padding-right: 45px; background-color: {theme_color[1]};")
-        text_new_password.setEchoMode(QLineEdit.Password)
-        text_new_password.setFixedSize(320, 50)
-        # parent.text_new_password.textChanged.connect(remove_error_message)
-        # text_actual_password.textChanged.connect(remove_error_message)
+        self.text_new_password = QLineEdit()
+        self.text_new_password.setPlaceholderText("New password...")
+        self.text_new_password.setStyleSheet(f"color: {theme_color[4]}; border-radius: 10px; border: 1px solid #ccc; padding: 3px; padding-left: 10px; padding-right: 45px; background-color: {theme_color[1]};")
+        self.text_new_password.setEchoMode(QLineEdit.Password)
+        self.text_new_password.setFixedSize(320, 50)
+        self.text_new_password.textChanged.connect(remove_error_message)
 
         toggle_button_2 = QPushButton()
-        toggle_button_2.setIcon(QIcon(f"src/resources/images/{theme_color[4]}/password/showpassword.png"))  # Cambia "path/to/eye_icon.png" a la ruta de tu icono de ojo self
+        icon_path = os.path.join(base_path_up, "resources", "images", theme_color[4], "password", "showpassword.png")
+        toggle_button_2.setIcon(QIcon(icon_path))  # Cambia "path/to/eye_icon.png" a la ruta de tu icono de ojo self
         toggle_button_2.setCheckable(True)
         toggle_button_2.setStyleSheet("background: transparent; border: none; padding-right: 15px; padding-top: 3px;")
         toggle_button_2.setCursor(Qt.PointingHandCursor)
         toggle_button_2.clicked.connect(lambda: toggle_password_visibility_2(theme_color))
 
         password_layout_2 = QHBoxLayout()
-        password_layout_2.addWidget(text_new_password)
+        password_layout_2.addWidget(self.text_new_password)
         password_layout_2.addWidget(toggle_button_2)
 
-        text_confirm_new_password = QLineEdit()
-        text_confirm_new_password.setPlaceholderText("Confirmar nueva contraseña...")
-        text_confirm_new_password.setStyleSheet(f"color: {theme_color[4]}; border-radius: 10px; border: 1px solid #ccc; padding: 3px; padding-left: 10px; padding-right: 45px; background-color: {theme_color[1]};")
-        text_confirm_new_password.setEchoMode(QLineEdit.Password)
-        text_confirm_new_password.setFixedSize(320, 50)
-        # parent.text_confirm_new_password.textChanged.connect(remove_error_message)
+        self.text_confirm_new_password = QLineEdit()
+        self.text_confirm_new_password.setPlaceholderText("Confirm new password...")
+        self.text_confirm_new_password.setStyleSheet(f"color: {theme_color[4]}; border-radius: 10px; border: 1px solid #ccc; padding: 3px; padding-left: 10px; padding-right: 45px; background-color: {theme_color[1]};")
+        self.text_confirm_new_password.setEchoMode(QLineEdit.Password)
+        self.text_confirm_new_password.setFixedSize(320, 50)
+        self.text_confirm_new_password.textChanged.connect(remove_error_message)
         # text_actual_password.textChanged.connect(remove_error_message)
 
         toggle_button_3 = QPushButton()
-        toggle_button_3.setIcon(QIcon(f"src/resources/images/{theme_color[4]}/password/showpassword.png"))  # Cambia "path/to/eye_icon.png" a la ruta de tu icono de ojo self
+        icon_path_3 = os.path.join(base_path_up, "resources", "images", theme_color[4], "password", "showpassword.png")
+        toggle_button_3.setIcon(QIcon(icon_path_3))
         toggle_button_3.setCheckable(True)
         toggle_button_3.setStyleSheet("background: transparent; border: none; padding-right: 15px; padding-top: 3px;")
         toggle_button_3.setCursor(Qt.PointingHandCursor)
         toggle_button_3.clicked.connect(lambda: toggle_password_visibility_3(theme_color))
 
         password_layout_3 = QHBoxLayout()
-        password_layout_3.addWidget(text_confirm_new_password)
+        password_layout_3.addWidget(self.text_confirm_new_password)
         password_layout_3.addWidget(toggle_button_3)
 
-        save_changes = QPushButton("Guardar cambios")
+        save_changes = QPushButton("Save changes")
         save_changes.setStyleSheet(f""" 
             background-color: {theme_color[0]}; 
             color: {theme_color[4]}; 
@@ -210,9 +207,8 @@ class NewPassword(QDialog):
             font-size: 16px;
         """)
         save_changes.setCursor(Qt.PointingHandCursor)  # Cambiar el cursor a puntero
-        # save_changes.clicked.connect(on_save_changes_button_click)
+        save_changes.clicked.connect(on_save_changes_button_click)
 
-        passwords_layout.addLayout(password_layout)
         passwords_layout.addLayout(password_layout_2)
         passwords_layout.addLayout(password_layout_3)
         input_layout.addLayout(passwords_layout)
@@ -234,9 +230,10 @@ class NewPassword(QDialog):
         dialog.setLayout(layout)  # Asigna el layout principal al diálogo
 
         dialog.exec_()
+        QApplication.quit()
 
     def closeEvent(self, event):
         # Aquí puedes realizar cualquier limpieza antes de cerrar
         print("El diálogo se ha cerrado.")
-        self.accept() 
+        event.accept()
 
