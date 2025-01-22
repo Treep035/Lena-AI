@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 
+from controller.account_session_controller import account_session_controller
 from controller.auth_token_controller import check_auth_token_controller
 from controller.auth_token_controller import check_refresh_token_controller
 from controller.handle_lenaai_url_controller import handle_lenaai_url_controller
@@ -46,16 +47,20 @@ class MainWindow(QMainWindow):
         # Conectar las señales
         self.login_widget.switch_to_register.connect(self.show_register)
         self.register_widget.switch_to_login.connect(self.show_login)
+        self.register_widget.switch_to_home.connect(self.generate_account_session_controller)
         self.register_widget.switch_to_home.connect(self.show_home)
+        self.login_widget.switch_to_home.connect(self.generate_account_session_controller)
         self.login_widget.switch_to_home.connect(self.show_home)
 
         logged_in = check_auth_token_controller()
 
         if logged_in:
+            self.generate_account_session_controller()
             self.show_home()
         else:
             logged_in = check_refresh_token_controller()
             if logged_in:
+                self.generate_account_session_controller()
                 self.show_home()
             else:
                 self.show_login()
@@ -71,6 +76,9 @@ class MainWindow(QMainWindow):
         self.register_widget.hide()
         self.layout.addWidget(self.login_widget)
         self.login_widget.show()
+
+    def generate_account_session_controller(self):
+        account_session_controller(self)
 
     def show_home(self):
         self.layout.removeWidget(self.register_widget)

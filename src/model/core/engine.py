@@ -209,14 +209,24 @@ def start(self):
     language_aliases = {
     "inglés": "english",
     "español": "spanish",
+    "catalán": "catalan",
     "francés": "french",
     "alemán": "german",
     "italiano": "italian",
-    "portugués": "portuguese",
+    "portugués": "portuguese (portugal, brazil)",
     "chino": "chinese",
     "japonés": "japanese",
     "ruso": "russian",
 }
+    
+    divisas = {
+    "dólar": "USD",
+    "euro": "EUR",
+    "libra": "GBP",
+    "yen": "JPY",
+    "yuan": "CNY",
+    "peso": "MXN",
+    }
     
     palabras_a_numeros = {
     "uno": 1, "dos": 2, "tres": 3, "cuatro": 4, "cinco": 5,
@@ -314,10 +324,14 @@ def start(self):
                                     else:
                                         pass
 
-                elif "busca" in user_input.lower():
+                elif any(form in user_input.lower() for form in ["encuentra en google", "encuéntrame en google", "busca en google", "buscar en google", "búscame en google", "encuentra en internet", "encuéntrame en internet", "busca en internet", "buscar en internet", "búscame en internet", "busca", "buscar", "búscame", "encuentra", "encuéntrame"]):
                     search_finished = False
                     while not search_finished:
-                        search_query = user_input.lower().replace("busca ", "")
+                        match = re.search(r"(encuentra en google|encuéntrame en google|busca en google|buscar en google|búscame en google|encuentra en internet|encuéntrame en internet|busca en internet|buscar en internet|búscame en internet|busca|buscar|búscame|encuentra|encuéntrame)\s+(.*)", user_input.lower())
+                        if match and match.group(2):  # Si hay un texto para traducir
+                            search_query = match.group(2).strip()
+                        else:
+                            pass
                         search_url = f"https://www.google.com/search?q={search_query}"
                         webbrowser.open(search_url)
                         response = f"Buscando {search_query} en Google."
@@ -350,10 +364,14 @@ def start(self):
                                 search_finished_2 = True
                                 stop(self)
                 
-                elif "abre" in user_input.lower():
+                elif any(form in user_input.lower() for form in ["abre", "ábreme", "abrir", "abre el programa", "ábreme el programa", "abrir el programa", "abre la app", "ábreme la app", "abrir la app", "abre la aplicación", "ábreme la aplicación", "abrir la aplicación", "abre programa", "ábreme programa", "abrir programa", "abre app", "ábreme app", "abrir app", "abre aplicación", "ábreme aplicación", "abrir aplicación"]):
                     open_finished = False
                     while not open_finished:
-                        programa = user_input.lower().replace("abre ", "")  # Obtener el texto después de "abre"
+                        match = re.search(r"(abre el programa|ábreme el programa|abrir el programa|abre la app|ábreme la app|abrir la app|abre la aplicación|ábreme la aplicación|abrir la aplicación|abre programa|ábreme programa|abrir programa|abre app|ábreme app|abrir app|abre aplicación|ábreme aplicación|abrir aplicación|abre|ábreme|abrir)\s+(.*)", user_input.lower())
+                        if match and match.group(2):  # Si hay un texto para traducir
+                                programa = match.group(2).strip()
+                        else:
+                            pass
                         if programa in programas_disponibles:
                             try:
                                 os.startfile(programas_disponibles[programa]) 
@@ -383,8 +401,8 @@ def start(self):
 
                 # Crear un diccionario para mapear palabras clave a códigos de idioma
 
-                elif any(form in user_input.lower() for form in ["traduce"]):
-                        match = re.search(r"(traduce)\s+(.*)", user_input.lower())
+                elif any(form in user_input.lower() for form in ["traduce", "traducir", "traducción", "traductor", "traduce esto", "traduce lo siguiente", "tradúce la palabra", "tradúce la frase", "tradúce la oración", "traduce la siguiente frase", "traduce la siguiente oración", "traduce la siguiente palabra", "tradúceme", "tradúceme esto", "tradúceme lo siguiente", "tradúceme la frase", "tradúceme la oración", "tradúceme la palabra", "tradúceme la siguiente frase", "tradúceme la siguiente oración", "tradúceme la siguiente palabra"]):
+                        match = re.search(r"(traduce esto|traduce lo siguiente|tradúce la palabra|tradúce la frase|tradúce la oración|traduce la siguiente frase|traduce la siguiente oración|traduce la siguiente palabra|tradúceme esto|tradúceme lo siguiente|tradúceme la frase|tradúceme la oración|tradúceme la palabra|tradúceme la siguiente frase|tradúceme la siguiente oración|tradúceme la siguiente palabra|traduce|traducir|traducción|traductor|tradúceme)\s+(.*)", user_input.lower())
 
                         if match and match.group(2):  # Si hay un texto para traducir
                             user_input = match.group(2).strip()
@@ -393,7 +411,7 @@ def start(self):
                             user_input = transcribe_audio_to_text()
                         translate_finished = False
                         while not translate_finished:
-                            match = re.search(r"(traduce)\s+(.*)", user_input.lower())
+                            match = re.search(r"(traduce esto|traduce lo siguiente|tradúce la palabra|tradúce la frase|tradúce la oración|traduce la siguiente frase|traduce la siguiente oración|traduce la siguiente palabra|tradúceme esto|tradúceme lo siguiente|tradúceme la frase|tradúceme la oración|tradúceme la palabra|tradúceme la siguiente frase|tradúceme la siguiente oración|tradúceme la siguiente palabra|traduce|traducir|traducción|traductor|tradúceme)\s+(.*)", user_input.lower())
 
                             if match and match.group(2):  # Si hay un texto para traducir
                                 user_input = match.group(2).strip()
@@ -403,6 +421,8 @@ def start(self):
                             text_to_translate = user_input.strip()
                             # Preguntar por el idioma objetivo
                             speak("¿A qué idioma quieres traducir?")
+                            # for lang_code, lang_name in LANGUAGES.items():
+                                # print(f"{lang_code}: {lang_name}")
                             user_input = transcribe_audio_to_text()
                             translate_finished_2 = False
                             while not translate_finished_2:
@@ -650,43 +670,78 @@ def start(self):
                                 stop(self)
 
                 # Código de integración con el flujo de la conversación
-                elif any(form in user_input for form in ["convertir divisa", "divisa", "divisas", "cambio de moneda", "cambio de divisas"]):
-                    match = re.search(r"(convertir divisa|divisa|divisas|cambio de moneda|cambio de divisas)\s+(.*)", user_input.lower())
+                elif any(form in user_input for form in ["convertir divisa", "divisa", "divisas", "cambio de moneda", "cambio de divisas", "convertir"]):
+                    match = re.search(r"(convertir divisa|divisa|divisas|cambio de moneda|cambio de divisas|convertir)\s+(.*)", user_input.lower())
                     
                     if match and match.group(2):  # Si hay un texto después de la palabra clave
                         user_input = match.group(2).strip()
-                        divisa_entrada, divisa_salida = extraer_divisas(user_input)  # Llamamos a la función que extrae las divisas
                         def extraer_divisas(user_input):
-                            divisas_posibles = ["usd", "eur", "gbp", "jpy", "mxn", "inr", "cad"]  # Agrega las divisas que soportas
-                            divisas = user_input.lower().split("a")  # Asumiendo que el formato es algo como "usd a eur"
-                            
-                            if len(divisas) == 2:
-                                divisa_entrada = divisas[0].strip()
-                                divisa_salida = divisas[1].strip()
+                            divisa_entrada, divisa_salida = None, None
+
+                            partes = user_input.split(" a ")  # Asumiendo que el formato es algo como "usd a eur"
+                            print(partes)
+
+                            if len(partes) == 2:
+                                divisa_entrada = partes[0].strip()
+                                divisa_salida = partes[1].strip()
                                 
-                                # Validamos si las divisas están en nuestra lista
-                                if divisa_entrada in divisas_posibles and divisa_salida in divisas_posibles:
-                                    return divisa_entrada, divisa_salida
+                                divisa_entrada_siglas = None
+                                divisa_salida_siglas = None
+
+                                for nombre_divisa, codigo_divisa in divisas.items():
+                                    print(f"Comprobando si '{nombre_divisa}' está en '{divisa_entrada}' o '{divisa_salida}'")
+                                    
+                                    # Si encontramos una divisa en la entrada, asignamos su código
+                                    if nombre_divisa in divisa_entrada:
+                                        if divisa_entrada_siglas is None:
+                                            divisa_entrada_siglas = codigo_divisa
+                                            print(f"Divisa de entrada encontrada: {divisa_entrada_siglas}")
+                                        else:
+                                            pass  # Si ya se ha asignado la divisa de entrada, no hacemos nada
+
+                                    # Si encontramos una divisa en la salida, asignamos su código
+                                    if nombre_divisa in divisa_salida:
+                                        if divisa_salida_siglas is None:
+                                            divisa_salida_siglas = codigo_divisa
+                                            print(f"Divisa de salida encontrada: {divisa_salida_siglas}")
+                                        else:
+                                            pass  # Si ya se ha asignado la divisa de salida, no hacemos nada
+                            
+                            if divisa_entrada_siglas and divisa_salida_siglas:
+                                return divisa_entrada_siglas, divisa_salida_siglas
                             return None, None
-                        if divisa_entrada and divisa_salida:
-                            speak(f"Voy a convertir {divisa_entrada} a {divisa_salida}. ¿Cuál es la cantidad?")
-                            cantidad = transcribe_audio_to_text()
-                            if cantidad.isnumeric():
+                        
+                        divisa_entrada_siglas, divisa_salida_siglas = extraer_divisas(user_input)  # Llamamos a la función que extrae las divisas
+                        print (divisa_entrada_siglas, divisa_salida_siglas)
+                        if divisa_entrada_siglas and divisa_salida_siglas:
+                            speak(f"¡Perfecto! ¿Cuál es la cantidad?")
+                            user_input = transcribe_audio_to_text()
+                            def convertir_a_num(user_input):
+                                print("depuracion")
+                                if user_input.isnumeric():
+                                    return int(user_input)
+                                elif user_input.lower() in palabras_a_numeros:
+                                    return palabras_a_numeros[user_input.lower()]
+                                else:
+                                    return None
+                            cantidad = convertir_a_num(user_input)
+                            if cantidad is not None:
                                 cantidad = float(cantidad)
-                                resultado = realizar_conversion(divisa_entrada, divisa_salida, cantidad)
-                                def realizar_conversion(divisa_entrada, divisa_salida, cantidad):
-                                    tasa = obtener_tasa_de_cambio(divisa_entrada, divisa_salida)
-                                    def obtener_tasa_de_cambio(divisa_entrada, divisa_salida):
+                                def realizar_conversion(divisa_entrada, divisa_salida_siglas, cantidad):
+                                    def obtener_tasa_de_cambio(divisa_entrada, divisa_salida_siglas):
                                         load_dotenv()
                                         api_key_exchange = os.getenv('API_KEY_EXCHANGE')
-                                        BASE_URL = "https://v6.exchangerate-api.com/v6/{}/latest/".format(api_key_exchange)
-                                        url = BASE_URL + divisa_entrada  # URL con la divisa base
+                                        BASE_URL = f"https://v6.exchangerate-api.com/v6/{api_key_exchange}/latest/{divisa_entrada}"
+                                        url = BASE_URL  # URL con la divisa base
+                                        print(f"Divisa de entrada: {divisa_entrada}")
+                                        print(f"Divisa de salida: {divisa_salida_siglas}")
+                                        print(url)
                                         try:
                                             response = requests.get(url)
                                             data = response.json()
                                             
                                             if data['result'] == 'success':
-                                                tasa = data['conversion_rates'].get(divisa_salida)
+                                                tasa = data['conversion_rates'].get(divisa_salida_siglas)
                                                 if tasa:
                                                     return tasa
                                                 else:
@@ -699,14 +754,19 @@ def start(self):
                                             speak("Hubo un error al consultar la API de tasas de cambio.")
                                             print(f"Error: {e}")
                                             return None
+                                    tasa = obtener_tasa_de_cambio(divisa_entrada, divisa_salida_siglas)
                                     if tasa:
                                         resultado = cantidad * tasa
-                                        return resultado
+                                        resultado_formateado = "{:,.2f}".format(resultado).replace(',', ' ').replace('.', ',')
+                                        return resultado_formateado
                                     else:
                                         return "Tasa de cambio no disponible."
-                                speak(f"{cantidad} {divisa_entrada} es igual a {resultado} {divisa_salida}.")
+                                resultado_formateado = realizar_conversion(divisa_entrada_siglas, divisa_salida_siglas, cantidad)
+                                speak(f"{cantidad} {divisa_entrada_siglas} son {resultado_formateado} {divisa_salida_siglas}.")
+                                speak("¿Cuál es tu siguiente consulta?")
                             else:
-                                speak("No entendí la cantidad. Por favor, dime un número.")
+                                speak("No entendí la cantidad. Por favor, indícamelo mejor la próxima vez.")
+                                speak("¿Cuál es tu siguiente consulta?")
                         else:
                             speak("No pude identificar las divisas que deseas convertir. ¿Puedes repetirlo?")
                     else:

@@ -146,8 +146,54 @@ def process_message(self, original_message):
             "¿Qué le dice una impresora a otra? ¡Eres la hoja de mi vida!",
         ]
 
+        if any(form in message for form in ["reproduce", "reproducir", "reprodúceme", "música", "músicas", "canción",
+                                                                "canciones", "escuchar", "pon", "ponme", "poner"]):
+            reproduce_finished = False
+            while not reproduce_finished:
+                match = re.search(r"(reprodúceme(?: la)?|reproduce(?: la)?|reproducir(?: la)?|poner(?: la)?|músicas(?: de)?|música(?: de)?|canciones(?: de)?|canción(?: de)?|escuchar(?: la)?|pon(?:me)?(?: la)?)\s+(?:canciones(?: de)?|canción(?: de)?|músicas(?: de)?|música(?: de)?\s)?(.*)", message)
+
+                if match and match.group(2):  # Si se encuentra una coincidencia y hay palabras después de la clave
+                    search_query = match.group(2).strip()  # Extraer la parte que viene después de la palabra clave
+                else:
+                    bot_response = "Debes introducir la canción."
+                    break
+
+                load_dotenv()
+                api_key_youtube = os.getenv('API_KEY_YOUTUBE')
+
+                def get_youtube_video_url(query, api_key_youtube):
+                    # Hacer la búsqueda en YouTube
+                    url = f"https://www.googleapis.com/youtube/v3/search?part=snippet&q={query}&key={api_key_youtube}"
+                    response = requests.get(url).json()
+                    
+                    # Obtener el primer resultado (ID del video)
+                    if 'items' in response and len(response['items']) > 0:
+                        for item in response['items']:
+                            # Verifica si el item es un video
+                            if item['id']['kind'] == 'youtube#video':
+                                try:
+                                    # Obtén el videoId
+                                    video_id = item['id'].get('videoId')
+                                    if video_id:
+                                        return f"https://www.youtube.com/watch?v={video_id}"
+                                except KeyError as e:
+                                    print(f"Error de clave en la respuesta de la API: {e}")
+                                    return None
+                        print("No se encontró un video válido.")
+                        return None
+                    else:
+                        print("No se encontraron resultados en YouTube.")
+                        return None
+                
+                video_url = get_youtube_video_url(search_query, api_key_youtube)
+
+                if video_url:
+                    webbrowser.open(video_url)
+                    bot_response = f"Reproduciendo {search_query} en YouTube."
+                    reproduce_finished = True
+
         # Comprobar si el mensaje comienza con "busca"
-        if any(form in message for form in ["busca", "busques", "buscases", "buscar", "buscame"]):
+        elif any(form in message for form in ["busca", "busques", "buscases", "buscar", "buscame"]):
             # Dividir el mensaje en palabras y encontrar la posición de la forma del verbo
             palabras = message.split()
             try:
@@ -282,7 +328,7 @@ def process_message(self, original_message):
         # Jugar cara o cruz
         elif any(form in message for form in ["cara o cruz"]):
             resultado = random.choice(["Cara", "Cruz"])
-            bot_response = f"El resultado es: {resultado}."
+            bot_response = f"Ha salido... {resultado}."
 
         elif "piedra papel tijeras" in message:
             # Instrucciones para jugar
