@@ -1023,6 +1023,7 @@ def start(self):
                                         elif any(palabra in user_input.lower() for palabra in palabras_cancelation):
                                             numero_oculto_finished_2 = True
                                             numero_oculto_finished = True
+                                            intentos = 11
                                             stop(self)
                                         else:
                                             numero_oculto_finished_3 = False
@@ -1039,15 +1040,16 @@ def start(self):
                                                     numero_oculto_finished_3 = True
                                                     numero_oculto_finished_2 = True
                                                     numero_oculto_finished = True
+                                                    intentos = 11
                                                     stop(self)
                                                 else:
                                                     pass
-                                elif numero < 1 or numero > 100:
+                                elif numero < 1 or numero > 100 and not numero_oculto_finished:
                                     speak("El número debe estar entre 1 y 100.")
-                                elif numero < numero_oculto:
+                                elif numero < numero_oculto and not numero_oculto_finished:
                                     speak(f"El número es mayor que {numero}.")
                                     intentos += 1
-                                else:
+                                elif numero > numero_oculto and not numero_oculto_finished:
                                     speak(f"El número es menor que {numero}.")
                                     intentos += 1
                             elif any(palabra in user_input.lower() for palabra in palabras_cancelation):
@@ -1070,6 +1072,7 @@ def start(self):
                                 elif any(palabra in user_input.lower() for palabra in palabras_cancelation):
                                     numero_oculto_finished_4 = True
                                     numero_oculto_finished = True
+                                    intentos = 11
                                     stop(self)
                                 else:
                                     numero_oculto_finished_5 = False
@@ -1086,6 +1089,7 @@ def start(self):
                                             numero_oculto_finished_5 = True
                                             numero_oculto_finished_4 = True
                                             numero_oculto_finished = True
+                                            intentos = 11
                                             stop(self)
                                         else:
                                             pass
